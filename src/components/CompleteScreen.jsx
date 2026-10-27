@@ -2,7 +2,7 @@ import React from 'react';
 import { Check } from 'lucide-react';
 
 // task finished confirmation screen
-export default function CompleteScreen() {
+export default function CompleteScreen({ navigate }) {
   return (
     <div className="flex-1 px-6 py-4 flex flex-col justify-between items-center text-center overflow-y-auto pb-20">
       <div className="w-full flex flex-col items-center pt-6">
@@ -34,7 +34,11 @@ export default function CompleteScreen() {
       </div>
 
       <div className="w-full space-y-2">
-        <button className="w-full py-3 bg-[#193a20] text-white font-bold text-xs rounded-xl">
+        {/* return to home — brings user back to the start */}
+        <button
+          onClick={() => navigate('home')}
+          className="w-full py-3 bg-[#193a20] text-white font-bold text-xs rounded-xl"
+        >
           Return to Home
         </button>
         <p className="text-[10px] text-slate-500">

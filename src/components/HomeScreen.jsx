@@ -1,7 +1,7 @@
 import React from 'react';
 
 // home screen showing shift greeting and task choices
-export default function HomeScreen() {
+export default function HomeScreen({ navigate }) {
   return (
     <div className="flex-1 px-6 py-2 flex flex-col justify-between overflow-y-auto pb-20">
       <div>
@@ -51,8 +51,11 @@ export default function HomeScreen() {
         </div>
       </div>
 
-      {/* start shift button at bottom */}
-      <button className="w-full py-3 bg-[#193a20] text-white font-bold text-sm rounded-xl">
+      {/* start shift button — navigates to the daily schedule */}
+      <button
+        onClick={() => navigate('schedule')}
+        className="w-full py-3 bg-[#193a20] text-white font-bold text-sm rounded-xl"
+      >
         Start Shift
       </button>
     </div>

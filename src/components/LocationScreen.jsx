@@ -1,26 +1,29 @@
 import React from 'react';
-import { 
-  ArrowLeft, 
-  ChevronUp, 
-  ChevronDown, 
-  ChevronLeft, 
-  ChevronRight, 
-  AlertTriangle, 
-  Compass, 
+import {
+  ArrowLeft,
+  ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  AlertTriangle,
+  Compass,
   MapPin,
   Trees
 } from 'lucide-react';
 
 // location check screen showing the park site map and caution zones
-export default function LocationScreen() {
+export default function LocationScreen({ navigate }) {
   return (
     <div className="flex-1 px-6 py-2 flex flex-col justify-between overflow-y-auto pb-20">
       <div>
-        {/* Top navigation row */}
+        {/* top navigation row */}
         <div className="flex items-center justify-between mb-1">
-          <div className="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center">
+          <button
+            onClick={() => navigate('schedule')}
+            className="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center"
+          >
             <ArrowLeft className="w-3.5 h-3.5" />
-          </div>
+          </button>
           <span className="text-[10px] font-bold tracking-widest text-slate-900 uppercase">
             01 / 02 • LOCATION
           </span>
@@ -109,8 +112,11 @@ export default function LocationScreen() {
         </div>
       </div>
 
-      {/* confirm button */}
-      <button className="w-full py-3 bg-[#193a20] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-sm">
+      {/* confirm location — advances to site notes */}
+      <button
+        onClick={() => navigate('notes')}
+        className="w-full py-3 bg-[#193a20] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-sm"
+      >
         <Compass className="w-4 h-4" />
         <span>Confirm Location</span>
       </button>
