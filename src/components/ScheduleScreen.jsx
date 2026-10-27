@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 
 // daily schedule view with tasks
-export default function ScheduleScreen() {
+export default function ScheduleScreen({ navigate }) {
   return (
     <div className="flex-1 px-6 py-2 flex flex-col justify-between overflow-y-auto pb-20">
       <div>
@@ -12,7 +12,7 @@ export default function ScheduleScreen() {
         </h1>
         <p className="text-xs text-slate-700 mb-4">2 assigned tasks, 07:00 – 15:00</p>
 
-        {/* show scheduled task */}
+        {/* scheduled task — tapping the arrow starts the Zone 4 flow */}
         <div className="bg-[#9db59a] rounded-2xl p-4 text-slate-900 mb-3 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="bg-white text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -27,13 +27,17 @@ export default function ScheduleScreen() {
               <p className="text-xs text-slate-800 mt-0.5">North Park</p>
               <p className="text-[11px] text-slate-700">5 acres - Est. 2 hours</p>
             </div>
-            <div className="w-8 h-8 rounded-full bg-[#193a20] text-white flex items-center justify-center">
+            {/* navigate to location confirmation for this task */}
+            <button
+              onClick={() => navigate('location')}
+              className="w-8 h-8 rounded-full bg-[#193a20] text-white flex items-center justify-center"
+            >
               <ChevronRight className="w-5 h-5" />
-            </div>
+            </button>
           </div>
         </div>
 
-        {/* show pending task */}
+        {/* pending task — not yet actionable in this flow */}
         <div className="bg-[#9db59a] rounded-2xl p-4 text-slate-900 mb-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="bg-white text-amber-700 text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 border border-amber-400">

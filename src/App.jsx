@@ -14,17 +14,17 @@ export default function App() {
   // simple state to choose which screen to show
   const [activeScreen, setActiveScreen] = useState('home');
 
-  // choose which screen component to display
+  // choose which screen component to display, passing navigate so screens can trigger transitions
   const renderCurrentScreen = () => {
     switch (activeScreen) {
-      case 'home': return <HomeScreen />;
-      case 'schedule': return <ScheduleScreen />;
-      case 'location': return <LocationScreen />;
-      case 'notes': return <NotesScreen />;
-      case 'checklist': return <ChecklistScreen />;
-      case 'complete': return <CompleteScreen />;
-      case 'blocker': return <BlockerScreen />;
-      default: return <HomeScreen />;
+      case 'home':      return <HomeScreen     navigate={setActiveScreen} />;
+      case 'schedule':  return <ScheduleScreen  navigate={setActiveScreen} />;
+      case 'location':  return <LocationScreen  navigate={setActiveScreen} />;
+      case 'notes':     return <NotesScreen     navigate={setActiveScreen} />;
+      case 'checklist': return <ChecklistScreen navigate={setActiveScreen} />;
+      case 'complete':  return <CompleteScreen  navigate={setActiveScreen} />;
+      case 'blocker':   return <BlockerScreen   navigate={setActiveScreen} />;
+      default:          return <HomeScreen      navigate={setActiveScreen} />;
     }
   };
 
