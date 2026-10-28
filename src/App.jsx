@@ -18,13 +18,16 @@ const ISSUES_SCREENS = ['blocker'];
 const MAP_SCREENS    = ['location'];
 
 export default function App() {
-  const openIssue = (source) => {
-  setIssueSource(source);
-  setActiveScreen('blocker');
-};
   // simple state to choose which screen to show
   const [activeScreen, setActiveScreen] = useState('home');
+  // tracks which screen opened the blocker, so X / Submit returns there
   const [issueSource, setIssueSource] = useState('home');
+
+  // opens the blocker sheet and remembers where to return on close
+  const openIssue = (source) => {
+    setIssueSource(source);
+    setActiveScreen('blocker');
+  };
 
   // derive which bottom-nav tab should appear active
   const navTab = SHIFT_SCREENS.includes(activeScreen)
@@ -44,13 +47,7 @@ export default function App() {
       case 'notes':     return <NotesScreen     navigate={setActiveScreen} />;
       case 'checklist': return <ChecklistScreen navigate={setActiveScreen} openIssue={openIssue} />;
       case 'complete':  return <CompleteScreen  navigate={setActiveScreen} />;
-      case 'blocker':
-  return (
-    <BlockerScreen
-      navigate={setActiveScreen}
-      returnScreen={issueSource}
-    />
-  );
+      case 'blocker':   return <BlockerScreen   navigate={setActiveScreen} returnScreen={issueSource} />;
       default:          return <HomeScreen      navigate={setActiveScreen} openIssue={openIssue} />;
     }
   };
@@ -104,7 +101,7 @@ export default function App() {
             <span className={`text-[10px] ${navTab === 'shift' ? 'font-extrabold' : 'font-bold'}`}>Shift</span>
           </button>
 
-          {/* Issues tab — navigates to the blocker / issue-reporting screen */}
+          {/* Issues tab — opens blocker and remembers to return to home on close */}
           <button
             onClick={() => openIssue('home')}
             className={`flex flex-col items-center gap-0.5 ${navTab === 'issues' ? 'text-[#193a20]' : 'text-slate-500'}`}
