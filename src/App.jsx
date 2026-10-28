@@ -18,8 +18,13 @@ const ISSUES_SCREENS = ['blocker'];
 const MAP_SCREENS    = ['location'];
 
 export default function App() {
+  const openIssue = (source) => {
+  setIssueSource(source);
+  setActiveScreen('blocker');
+};
   // simple state to choose which screen to show
   const [activeScreen, setActiveScreen] = useState('home');
+  const [issueSource, setIssueSource] = useState('home');
 
   // derive which bottom-nav tab should appear active
   const navTab = SHIFT_SCREENS.includes(activeScreen)
@@ -33,14 +38,20 @@ export default function App() {
   // choose which screen component to display, passing navigate so screens can trigger transitions
   const renderCurrentScreen = () => {
     switch (activeScreen) {
-      case 'home':      return <HomeScreen     navigate={setActiveScreen} />;
+      case 'home':      return <HomeScreen     navigate={setActiveScreen} openIssue={openIssue} />;
       case 'schedule':  return <ScheduleScreen  navigate={setActiveScreen} />;
       case 'location':  return <LocationScreen  navigate={setActiveScreen} />;
       case 'notes':     return <NotesScreen     navigate={setActiveScreen} />;
-      case 'checklist': return <ChecklistScreen navigate={setActiveScreen} />;
+      case 'checklist': return <ChecklistScreen navigate={setActiveScreen} openIssue={openIssue} />;
       case 'complete':  return <CompleteScreen  navigate={setActiveScreen} />;
-      case 'blocker':   return <BlockerScreen   navigate={setActiveScreen} />;
-      default:          return <HomeScreen      navigate={setActiveScreen} />;
+      case 'blocker':
+  return (
+    <BlockerScreen
+      navigate={setActiveScreen}
+      returnScreen={issueSource}
+    />
+  );
+      default:          return <HomeScreen      navigate={setActiveScreen} openIssue={openIssue} />;
     }
   };
 
@@ -95,7 +106,7 @@ export default function App() {
 
           {/* Issues tab — navigates to the blocker / issue-reporting screen */}
           <button
-            onClick={() => setActiveScreen('blocker')}
+            onClick={() => openIssue('home')}
             className={`flex flex-col items-center gap-0.5 ${navTab === 'issues' ? 'text-[#193a20]' : 'text-slate-500'}`}
           >
             {navTab === 'issues' ? (

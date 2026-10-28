@@ -1,7 +1,7 @@
 import React from 'react';
 
 // home screen showing shift greeting and task choices
-export default function HomeScreen({ navigate }) {
+export default function HomeScreen({ navigate, openIssue }) {
   return (
     <div className="flex-1 px-6 py-2 flex flex-col justify-between overflow-y-auto pb-20">
       <div>
@@ -35,7 +35,7 @@ export default function HomeScreen({ navigate }) {
 
         {/* Report Incident card — navigates directly to the issue reporting screen */}
         <button
-          onClick={() => navigate('blocker')}
+          onClick={() => openIssue('home')}
           className="w-full bg-[#ddd9d7] border border-[#cfcbc9] rounded-2xl p-3.5 mb-2.5 text-left active:brightness-95 transition-all duration-100"
         >
           <h3 className="font-extrabold text-[13px] text-slate-900">

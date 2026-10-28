@@ -8,7 +8,7 @@ const STEPS = [
 ];
 
 // task checklist screen
-export default function ChecklistScreen({ navigate }) {
+export default function ChecklistScreen({ navigate, openIssue }) {
   // track which steps are checked off
   const [checked, setChecked] = useState({ 1: true, 2: true, 3: false });
 
@@ -105,7 +105,7 @@ export default function ChecklistScreen({ navigate }) {
       {/* action buttons */}
       <div className="space-y-2">
         <button
-          onClick={() => navigate('blocker')}
+          onClick={() => openIssue('checklist')}
           className="w-full min-h-[48px] py-3 bg-amber-50 border-2 border-amber-600 text-amber-900 font-extrabold text-xs rounded-xl flex items-center justify-center gap-2"
         >
           <AlertTriangle className="w-4 h-4 text-amber-700" />

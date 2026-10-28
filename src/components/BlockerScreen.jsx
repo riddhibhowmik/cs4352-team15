@@ -8,7 +8,7 @@ const ISSUE_TYPES = [
 ];
 
 // issue reporting bottom-sheet when task has a blocker
-export default function BlockerScreen({ navigate }) {
+export default function BlockerScreen({ navigate, returnScreen }) {
   // track which issue type is selected — default to none
   const [selected, setSelected]   = useState(null);
   // track the name of any attached photo file
@@ -30,7 +30,7 @@ export default function BlockerScreen({ navigate }) {
           <h2 className="text-base font-black text-slate-900">Report Task Blocker</h2>
           {/* X closes the sheet and returns to the checklist */}
           <button
-            onClick={() => navigate('checklist')}
+            onClick={() => navigate(returnScreen)}
             className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer"
           >
             <X className="w-4 h-4 text-slate-700" />
@@ -105,7 +105,7 @@ export default function BlockerScreen({ navigate }) {
 
         {/* submit — enabled only when an issue type is selected */}
         <button
-          onClick={() => selected && navigate('checklist')}
+          onClick={() => selected && navigate(returnScreen)}
           disabled={!selected}
           className={`w-full min-h-[48px] py-3 font-extrabold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-opacity duration-150 ${
             selected
