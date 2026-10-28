@@ -20,18 +20,21 @@ export default function HomeScreen({ navigate }) {
           CHOOSE A WORKFLOW TASK
         </p>
 
-        {/* simple task card for routine mowing */}
-        <div className="bg-[#cfded0] border border-[#bcd0be] rounded-2xl p-3.5 mb-2.5">
+        {/* Zone 4 mowing card — tappable, starts the main workflow */}
+        <button
+          onClick={() => navigate('schedule')}
+          className="w-full bg-[#cfded0] border border-[#bcd0be] rounded-2xl p-3.5 mb-2.5 text-left active:brightness-95 transition-all duration-100"
+        >
           <h3 className="font-extrabold text-[13px] text-slate-900">
             Zone 4 - Routine Mowing and Inspection
           </h3>
           <p className="text-[11px] text-slate-700 mt-0.5">
             Confirm location, execute, and report any blockers
           </p>
-        </div>
+        </button>
 
-        {/* moderate task card for reporting an incident */}
-        <div className="bg-[#ddd9d7] border border-[#cfcbc9] rounded-2xl p-3.5 mb-2.5">
+        {/* Report Incident card — static for now, not yet wired */}
+        <div className="bg-[#ddd9d7] border border-[#cfcbc9] rounded-2xl p-3.5 mb-2.5 opacity-60">
           <h3 className="font-extrabold text-[13px] text-slate-900">
             Report Incident/Log New Issue
           </h3>
@@ -40,8 +43,8 @@ export default function HomeScreen({ navigate }) {
           </p>
         </div>
 
-        {/* complex task card for identifying protected zones and checking equipment */}
-        <div className="bg-[#ddd9d7] border border-[#cfcbc9] rounded-2xl p-3.5">
+        {/* Protected Zones card — static for now, not yet wired */}
+        <div className="bg-[#ddd9d7] border border-[#cfcbc9] rounded-2xl p-3.5 opacity-60">
           <h3 className="font-extrabold text-[13px] text-slate-900">
             Identify Protected Zones and Check Equipment
           </h3>
@@ -51,7 +54,7 @@ export default function HomeScreen({ navigate }) {
         </div>
       </div>
 
-      {/* start shift button — navigates to the daily schedule */}
+      {/* start shift button — also navigates to the daily schedule */}
       <button
         onClick={() => navigate('schedule')}
         className="w-full py-3 bg-[#193a20] text-white font-bold text-sm rounded-xl"

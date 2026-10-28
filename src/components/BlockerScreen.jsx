@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, Check, Wrench, Camera } from 'lucide-react';
+
+const ISSUE_TYPES = [
+  { id: 'weather',   label: 'Weather / Heavy Rain' },
+  { id: 'equipment', label: 'Equipment Breakdown' },
+  { id: 'access',    label: 'Access Blocked / Downed Tree' },
+];
 
 // issue reporting bottom-sheet when task has a blocker
 export default function BlockerScreen({ navigate }) {
+  // track which issue type is selected — default to none
+  const [selected, setSelected] = useState(null);
+
   return (
     <div className="flex-1 px-6 py-1 flex flex-col justify-end pb-12 relative bg-black/50">
       <div className="bg-white rounded-t-[32px] p-5 -mx-6 -mb-12 pb-14 shadow-2xl">
         <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-3"></div>
-        
+
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-base font-black text-slate-900">Report Task Blocker</h2>
           {/* X closes the sheet and returns to the checklist */}
@@ -20,24 +29,31 @@ export default function BlockerScreen({ navigate }) {
         </div>
         <p className="text-xs text-slate-700 mb-3 font-semibold">Select the issue type:</p>
 
-        {/* list of issue choices with high contrast */}
+        {/* single-select issue type buttons */}
         <div className="space-y-2 mb-3">
-          <div className="w-full min-h-[46px] px-4 rounded-xl text-xs font-bold bg-[#193a20] text-white flex items-center justify-between">
-            <span>Weather / Heavy Rain</span>
-            <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center bg-white/20">
-              <Check className="w-3.5 h-3.5 stroke-[3]" />
-            </div>
-          </div>
-
-          <div className="w-full min-h-[46px] px-4 rounded-xl text-xs font-bold border-2 border-slate-300 text-slate-900 flex items-center justify-between bg-slate-50">
-            <span>Equipment Breakdown</span>
-            <div className="w-5 h-5 rounded-full border-2 border-slate-400"></div>
-          </div>
-
-          <div className="w-full min-h-[46px] px-4 rounded-xl text-xs font-bold border-2 border-slate-300 text-slate-900 flex items-center justify-between bg-slate-50">
-            <span>Access Blocked / Downed Tree</span>
-            <div className="w-5 h-5 rounded-full border-2 border-slate-400"></div>
-          </div>
+          {ISSUE_TYPES.map(({ id, label }) => {
+            const isSelected = selected === id;
+            return (
+              <button
+                key={id}
+                onClick={() => setSelected(id)}
+                className={`w-full min-h-[46px] px-4 rounded-xl text-xs font-bold flex items-center justify-between transition-colors duration-150 ${
+                  isSelected
+                    ? 'bg-[#193a20] text-white'
+                    : 'border-2 border-slate-300 text-slate-900 bg-slate-50'
+                }`}
+              >
+                <span>{label}</span>
+                <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors duration-150 ${
+                  isSelected
+                    ? 'border-white bg-white/20'
+                    : 'border-2 border-slate-400'
+                }`}>
+                  {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         {/* optional note input */}
@@ -58,10 +74,15 @@ export default function BlockerScreen({ navigate }) {
           <span>Attach Photo of Obstacle</span>
         </div>
 
-        {/* submit — sends report and returns to checklist */}
+        {/* submit — enabled only when an issue type is selected */}
         <button
-          onClick={() => navigate('checklist')}
-          className="w-full min-h-[48px] py-3 bg-[#193a20] text-white font-extrabold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
+          onClick={() => selected && navigate('checklist')}
+          disabled={!selected}
+          className={`w-full min-h-[48px] py-3 font-extrabold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-opacity duration-150 ${
+            selected
+              ? 'bg-[#193a20] text-white opacity-100'
+              : 'bg-[#193a20] text-white opacity-40 cursor-not-allowed'
+          }`}
         >
           <Wrench className="w-4 h-4" />
           <span>Submit & Notify Dispatch</span>
