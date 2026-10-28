@@ -37,8 +37,8 @@ export default function ScheduleScreen({ navigate }) {
           </div>
         </div>
 
-        {/* pending task — not yet actionable in this flow */}
-        <div className="bg-[#9db59a] rounded-2xl p-4 text-slate-900 mb-4 shadow-sm">
+        {/* pending task — locked until Zone 4 is complete; pointer-events-none prevents any interaction */}
+        <div className="bg-[#9db59a] rounded-2xl p-4 text-slate-900 mb-4 shadow-sm opacity-60 cursor-not-allowed">
           <div className="flex items-center justify-between mb-2">
             <span className="bg-white text-amber-700 text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 border border-amber-400">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
@@ -51,8 +51,10 @@ export default function ScheduleScreen({ navigate }) {
               <h3 className="font-black text-base">Zone 2 - Trash Run</h3>
               <p className="text-xs text-slate-800 mt-0.5">East Trail & Picnic Area</p>
               <p className="text-[11px] text-slate-700">12 stations - Est. 45 minutes</p>
+              <p className="text-[10px] text-amber-800 font-bold mt-1">Unlocks after Zone 4 is complete</p>
             </div>
-            <div className="w-8 h-8 rounded-full bg-[#193a20]/60 text-white flex items-center justify-center">
+            {/* plain div — not a button, not interactive */}
+            <div className="w-8 h-8 rounded-full bg-slate-400 text-white flex items-center justify-center pointer-events-none">
               <ChevronRight className="w-5 h-5" />
             </div>
           </div>

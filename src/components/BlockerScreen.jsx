@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { X, Check, Wrench, Camera } from 'lucide-react';
 
 const ISSUE_TYPES = [
@@ -10,7 +10,16 @@ const ISSUE_TYPES = [
 // issue reporting bottom-sheet when task has a blocker
 export default function BlockerScreen({ navigate }) {
   // track which issue type is selected — default to none
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected]   = useState(null);
+  // track the name of any attached photo file
+  const [photoName, setPhotoName] = useState(null);
+  // ref to the hidden file input element
+  const fileInputRef = useRef(null);
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) setPhotoName(file.name);
+  };
 
   return (
     <div className="flex-1 px-6 py-1 flex flex-col justify-end pb-12 relative bg-black/50">
@@ -68,11 +77,31 @@ export default function BlockerScreen({ navigate }) {
           />
         </div>
 
-        {/* photo upload placeholder */}
-        <div className="w-full py-2.5 px-3 border border-dashed border-slate-400 rounded-xl flex items-center justify-center gap-2 text-slate-700 text-xs font-bold mb-4 bg-slate-50 cursor-pointer">
-          <Camera className="w-4 h-4 text-slate-800" />
-          <span>Attach Photo of Obstacle</span>
-        </div>
+        {/* hidden file input — accepts images, prefers camera on mobile */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handlePhotoChange}
+        />
+
+        {/* visible photo attach button — triggers the hidden input */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className={`w-full py-2.5 px-3 border border-dashed rounded-xl flex items-center justify-center gap-2 text-xs font-bold mb-4 transition-colors duration-150 ${
+            photoName
+              ? 'border-[#193a20] bg-emerald-50 text-emerald-900'
+              : 'border-slate-400 bg-slate-50 text-slate-700'
+          }`}
+        >
+          <Camera className={`w-4 h-4 ${photoName ? 'text-emerald-800' : 'text-slate-800'}`} />
+          <span className="truncate max-w-[200px]">
+            {photoName ? photoName : 'Attach Photo of Obstacle'}
+          </span>
+          {photoName && <Check className="w-3.5 h-3.5 text-emerald-700 stroke-[3] shrink-0" />}
+        </button>
 
         {/* submit — enabled only when an issue type is selected */}
         <button

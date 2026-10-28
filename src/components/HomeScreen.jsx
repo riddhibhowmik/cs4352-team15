@@ -20,7 +20,7 @@ export default function HomeScreen({ navigate }) {
           CHOOSE A WORKFLOW TASK
         </p>
 
-        {/* Zone 4 mowing card — tappable, starts the main workflow */}
+        {/* Zone 4 mowing card — starts the main shift workflow */}
         <button
           onClick={() => navigate('schedule')}
           className="w-full bg-[#cfded0] border border-[#bcd0be] rounded-2xl p-3.5 mb-2.5 text-left active:brightness-95 transition-all duration-100"
@@ -33,28 +33,34 @@ export default function HomeScreen({ navigate }) {
           </p>
         </button>
 
-        {/* Report Incident card — static for now, not yet wired */}
-        <div className="bg-[#ddd9d7] border border-[#cfcbc9] rounded-2xl p-3.5 mb-2.5 opacity-60">
+        {/* Report Incident card — navigates directly to the issue reporting screen */}
+        <button
+          onClick={() => navigate('blocker')}
+          className="w-full bg-[#ddd9d7] border border-[#cfcbc9] rounded-2xl p-3.5 mb-2.5 text-left active:brightness-95 transition-all duration-100"
+        >
           <h3 className="font-extrabold text-[13px] text-slate-900">
             Report Incident/Log New Issue
           </h3>
           <p className="text-[11px] text-slate-700 mt-0.5">
             Log an invasive species, equipment breakage, or get crews dispatched
           </p>
-        </div>
+        </button>
 
-        {/* Protected Zones card — static for now, not yet wired */}
-        <div className="bg-[#ddd9d7] border border-[#cfcbc9] rounded-2xl p-3.5 opacity-60">
+        {/* Protected Zones card — navigates to the map / location screen */}
+        <button
+          onClick={() => navigate('location')}
+          className="w-full bg-[#ddd9d7] border border-[#cfcbc9] rounded-2xl p-3.5 text-left active:brightness-95 transition-all duration-100"
+        >
           <h3 className="font-extrabold text-[13px] text-slate-900">
             Identify Protected Zones and Check Equipment
           </h3>
           <p className="text-[11px] text-slate-700 mt-0.5">
             Check maps, inspect boundaries, and reserve tools
           </p>
-        </div>
+        </button>
       </div>
 
-      {/* start shift button — also navigates to the daily schedule */}
+      {/* start shift button — navigates to the daily schedule */}
       <button
         onClick={() => navigate('schedule')}
         className="w-full py-3 bg-[#193a20] text-white font-bold text-sm rounded-xl"
