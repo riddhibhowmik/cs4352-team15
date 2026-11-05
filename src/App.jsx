@@ -9,11 +9,16 @@ import NotesScreen from './components/NotesScreen';
 import ChecklistScreen from './components/ChecklistScreen';
 import CompleteScreen from './components/CompleteScreen';
 import BlockerScreen from './components/BlockerScreen';
+import IssuesScreen from './components/IssuesScreen';
+import AlertsScreen from './components/AlertsScreen';
+import CrewDetailScreen from './components/CrewDetailScreen';
+import IncidentProgressScreen from './components/IncidentProgressScreen';
+import IssueResolvedScreen from './components/IssueResolvedScreen';
 
 // screens that belong to the Shift workflow (Calendar tab active)
 const SHIFT_SCREENS  = ['home', 'schedule', 'notes', 'checklist', 'complete'];
 // screens that belong to Issues (Trash2 tab active)
-const ISSUES_SCREENS = ['blocker'];
+const ISSUES_SCREENS = ['blocker', 'issues', 'crewDetail', 'incidentProgress', 'issueResolved'];
 // screens that belong to Map (Map tab active)
 const MAP_SCREENS    = ['location'];
 
@@ -22,6 +27,32 @@ export default function App() {
   const [activeScreen, setActiveScreen] = useState('home');
   // tracks which screen opened the blocker, so X / Submit returns there
   const [issueSource, setIssueSource] = useState('home');
+  // The latest submitted issue is shared between the issue form and Alerts.
+  const [submittedIssue, setSubmittedIssue] = useState(null);
+  const [issueStatus, setIssueStatus] = useState('Dispatched');
+  const [startedAt, setStartedAt] = useState(null);
+  const [resolvedAt, setResolvedAt] = useState(null);
+
+  const submitDispatch = (issue) => {
+    setSubmittedIssue({ ...issue, submittedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+    setIssueStatus('Dispatched');
+    setStartedAt(null);
+    setResolvedAt(null);
+    setActiveScreen('alerts');
+  };
+
+  // simulated crew progress, timestamps are from user actions
+  const startWork = () => {
+    setStartedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    setIssueStatus('In Progress');
+    setActiveScreen('incidentProgress');
+  };
+
+  const resolveIssue = () => {
+    setResolvedAt(new Date().toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }));
+    setIssueStatus('Resolved');
+    setActiveScreen('issueResolved');
+  };
 
   // opens the blocker sheet and remembers where to return on close
   const openIssue = (source) => {
@@ -47,6 +78,11 @@ export default function App() {
       case 'notes':     return <NotesScreen     navigate={setActiveScreen} />;
       case 'checklist': return <ChecklistScreen navigate={setActiveScreen} openIssue={openIssue} />;
       case 'complete':  return <CompleteScreen  navigate={setActiveScreen} />;
+      case 'issues':    return <IssuesScreen navigate={setActiveScreen} onDispatch={submitDispatch} />;
+      case 'alerts':    return <AlertsScreen navigate={setActiveScreen} issue={submittedIssue} status={issueStatus} />;
+      case 'crewDetail': return <CrewDetailScreen navigate={setActiveScreen} issue={submittedIssue} onStartWork={startWork} status={issueStatus} />;
+      case 'incidentProgress': return <IncidentProgressScreen navigate={setActiveScreen} issue={submittedIssue} startedAt={startedAt} onResolve={resolveIssue} />;
+      case 'issueResolved': return <IssueResolvedScreen navigate={setActiveScreen} issue={submittedIssue} resolvedAt={resolvedAt} />;
       case 'blocker':   return <BlockerScreen   navigate={setActiveScreen} returnScreen={issueSource} />;
       default:          return <HomeScreen      navigate={setActiveScreen} openIssue={openIssue} />;
     }
@@ -64,13 +100,14 @@ export default function App() {
         <button onClick={() => setActiveScreen('checklist')} className="px-2.5 py-1 bg-slate-700 text-white rounded">4. Checklist</button>
         <button onClick={() => setActiveScreen('complete')}  className="px-2.5 py-1 bg-slate-700 text-white rounded">5. Complete</button>
         <button onClick={() => setActiveScreen('blocker')}   className="px-2.5 py-1 bg-amber-700 text-white rounded">6. Blocker</button>
+        <button onClick={() => setActiveScreen('issues')}    className="px-2.5 py-1 bg-slate-700 text-white rounded">7. Issues</button>
       </div>
 
       {/* make it fit in smartphone screen size with rounded corners */}
       <div className="w-[375px] h-[780px] bg-white rounded-[40px] border-8 border-black shadow-2xl flex flex-col overflow-hidden relative">
 
-        {/* permanent top header with tree icon */}
-        <div className="px-6 pt-5 pb-2 flex items-center justify-between">
+        {/* permanent top header with tree icon, except on the Add Issue page */}
+        {!['issues', 'alerts', 'crewDetail', 'incidentProgress', 'issueResolved'].includes(activeScreen) && <div className="px-6 pt-5 pb-2 flex items-center justify-between">
           <div className="flex items-center gap-1.5 font-bold text-slate-900 text-base">
             <Trees className="w-5 h-5 text-slate-900" />
             <span>BioTracker</span>
@@ -78,7 +115,7 @@ export default function App() {
           <span className="text-[10px] font-black text-slate-900 tracking-wider">
             PARKS CREW
           </span>
-        </div>
+        </div>}
 
         {/* render active screen component */}
         {renderCurrentScreen()}
@@ -101,9 +138,9 @@ export default function App() {
             <span className={`text-[10px] ${navTab === 'shift' ? 'font-extrabold' : 'font-bold'}`}>Shift</span>
           </button>
 
-          {/* Issues tab — opens blocker and remembers to return to home on close */}
+          {/* Issues tab — opens the new add issue form, checklist blocker stays separate */}
           <button
-            onClick={() => openIssue('home')}
+            onClick={() => setActiveScreen('issues')}
             className={`flex flex-col items-center gap-0.5 ${navTab === 'issues' ? 'text-[#193a20]' : 'text-slate-500'}`}
           >
             {navTab === 'issues' ? (
@@ -131,12 +168,18 @@ export default function App() {
             <span className={`text-[10px] ${navTab === 'map' ? 'font-extrabold' : 'font-bold'}`}>Map</span>
           </button>
 
-          {/* Alerts tab — placeholder, no screen yet; returns user to home */}
+          {/* Alerts tab — shows the most recently submitted issue */}
           <button
-            onClick={() => setActiveScreen('home')}
-            className="flex flex-col items-center gap-0.5 text-slate-500"
+            onClick={() => setActiveScreen('alerts')}
+            className={`flex flex-col items-center gap-0.5 ${['alerts', 'crewDetail', 'incidentProgress', 'issueResolved'].includes(activeScreen) ? 'text-[#193a20]' : 'text-slate-500'}`}
           >
-            <Bell className="w-4 h-4" />
+            {['alerts', 'crewDetail', 'incidentProgress', 'issueResolved'].includes(activeScreen) ? (
+              <div className="w-12 h-7 rounded-full bg-[#193a20] text-white flex items-center justify-center">
+                <Bell className="w-4 h-4" />
+              </div>
+            ) : (
+              <Bell className="w-4 h-4" />
+            )}
             <span className="text-[10px] font-bold">Alerts</span>
           </button>
 
