@@ -10,6 +10,8 @@ import CompleteScreen from './components/CompleteScreen';
 import BlockerScreen from './components/BlockerScreen';
 import IssuesScreen from './components/IssuesScreen';
 import AlertsScreen from './components/AlertsScreen';
+import AddNotificationScreen from './components/AddNotificationScreen';
+import { NOTIFICATIONS } from './data/notifications';
 import CrewDetailScreen from './components/CrewDetailScreen';
 import IncidentProgressScreen from './components/IncidentProgressScreen';
 import IssueResolvedScreen from './components/IssueResolvedScreen';
@@ -35,7 +37,7 @@ import { findZone } from './data/zones';
 // location is left out on purpose — its tab depends on where it was opened from
 const TAB_SCREENS = {
   home:   ['home'],
-  alerts: ['alerts', 'crewDetail', 'incidentProgress', 'issueResolved'],
+  alerts: ['alerts', 'addNotification', 'crewDetail', 'incidentProgress', 'issueResolved'],
   tasks:  ['schedule', 'notes', 'checklist', 'complete', 'issues', 'blocker'],
   tools:  ['tools', 'map', 'zoneDetails', 'zoneResources', 'addResource',
            'inventory', 'inventoryItem', 'reserveConfirm', 'reserveSuccess',
@@ -68,6 +70,8 @@ export default function App() {
   const [issueStatus, setIssueStatus] = useState('Dispatched');
   const [startedAt, setStartedAt] = useState(null);
   const [resolvedAt, setResolvedAt] = useState(null);
+  // notices and issues on the Alerts tab, newest first
+  const [notifications, setNotifications] = useState(NOTIFICATIONS);
   // tracks which screen opened location / map, so Back returns there
   const [openedFrom, setOpenedFrom] = useState({ location: 'schedule', map: 'tools' });
   // Zone picked on the Map screen
@@ -186,8 +190,26 @@ export default function App() {
     setActiveScreen('zoneDetails');
   };
 
+  // posts a notification from the add notification form
+  const addNotification = (notification) => {
+    setNotifications((prev) => [notification, ...prev]);
+    setActiveScreen('alerts');
+  };
+
   const submitDispatch = (issue) => {
-    setSubmittedIssue({ ...issue, submittedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+    const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    setSubmittedIssue({ ...issue, submittedAt: time });
+    // the dispatched issue also goes on the notifications list, only the newest one links to the crew flow
+    setNotifications((prev) => [{
+      id: `n-issue-${Date.now()}`,
+      kind: 'issue',
+      urgency: issue.urgency,
+      title: issue.title,
+      text: issue.description || `${issue.location} — assigned to ${issue.team}`,
+      from: 'You',
+      time,
+      linkedIssue: true,
+    }, ...prev.map((item) => ({ ...item, linkedIssue: false }))]);
     setIssueStatus('Dispatched');
     setStartedAt(null);
     setResolvedAt(null);
@@ -243,7 +265,8 @@ export default function App() {
       case 'checklist': return <ChecklistScreen navigate={navigate} openIssue={openIssue} />;
       case 'complete':  return <CompleteScreen  navigate={navigate} />;
       case 'issues':    return <IssuesScreen navigate={navigate} onDispatch={submitDispatch} />;
-      case 'alerts':    return <AlertsScreen navigate={navigate} issue={submittedIssue} status={issueStatus} />;
+      case 'alerts':    return <AlertsScreen navigate={navigate} notifications={notifications} issue={submittedIssue} status={issueStatus} />;
+      case 'addNotification': return <AddNotificationScreen navigate={navigate} onAdd={addNotification} />;
       case 'crewDetail': return <CrewDetailScreen navigate={navigate} issue={submittedIssue} onStartWork={startWork} status={issueStatus} />;
       case 'incidentProgress': return <IncidentProgressScreen navigate={navigate} issue={submittedIssue} startedAt={startedAt} onResolve={resolveIssue} />;
       case 'issueResolved': return <IssueResolvedScreen navigate={navigate} issue={submittedIssue} resolvedAt={resolvedAt} />;

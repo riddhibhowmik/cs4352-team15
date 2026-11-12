@@ -1,9 +1,9 @@
 import { Play } from 'lucide-react';
 import ScreenHeader from './ScreenHeader';
+import UrgencyBadge from './UrgencyBadge';
 
 // crew detail screen
 const zoneLabel = (location) => location?.split(' - ').at(-1) || location || 'Location not specified';
-const isUrgent = (issue) => issue?.urgency?.toLowerCase().includes('urgent');
 
 export default function CrewDetailScreen({ navigate, issue, onStartWork, status }) {
   if (!issue) {
@@ -25,7 +25,7 @@ export default function CrewDetailScreen({ navigate, issue, onStartWork, status 
       <ScreenHeader onBack={() => navigate('alerts')} backLabel="Back to notifications" />
       <h1 className="page-title">Crew Detail</h1>
       <article className="card border-2 border-brand space-y-4">
-        <span className={isUrgent(issue) ? 'badge-urgent' : 'badge-routine'}>● {issue.urgency}</span>
+        <div><UrgencyBadge level={issue.urgency} /></div>
         <h2 className="section-title break-words">{issue.title}</h2>
         <div className="flex flex-wrap gap-x-4 gap-y-2 font-bold text-[13px]"><span>● {zoneLabel(issue.location)}</span><span>● {issue.team}</span></div>
         {issue.photo && <img src={issue.photo} alt="Issue photograph" className="w-full max-h-[170px] object-cover rounded-xl" />}

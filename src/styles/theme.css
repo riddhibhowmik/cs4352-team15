@@ -299,6 +299,33 @@
     @apply badge border-caution text-caution;
   }
 
+  /* notification urgency levels, lowest to highest */
+  .badge-fyi {
+    @apply badge border-brand-mid bg-brand-tint text-brand;
+  }
+
+  .badge-attention {
+    @apply badge border-caution text-caution;
+  }
+
+  .badge-act-now {
+    @apply badge border-danger bg-danger text-white;
+  }
+
+  /* small type tag on a notification, e.g. Issue / Notice */
+  .tag {
+    @apply inline-flex items-center gap-1 text-[12px] font-bold text-ink-muted;
+  }
+
+  /* filter chips above a list, e.g. All / Issues / Notices */
+  .chip {
+    @apply min-h-[36px] px-4 rounded-full border border-line bg-surface text-[13px] font-bold text-ink transition-colors;
+  }
+
+  .chip-selected {
+    @apply border-brand bg-brand text-white;
+  }
+
   /* misc */
 
   /* big check circle on success screens */

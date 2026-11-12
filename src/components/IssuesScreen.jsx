@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Camera, ChevronDown, Mic, Send, Square } from 'lucide-react';
 import ScreenHeader from './ScreenHeader';
+import { URGENCY } from '../data/notifications';
 
 // add Issue page
 export default function IssuesScreen({ navigate, onDispatch }) {
   const [title, setTitle] = useState('Invasive Plant in Quad 4');
   const [location, setLocation] = useState('North Park - Quad 4');
-  const [urgency, setUrgency] = useState('Urgent!');
+  const [urgency, setUrgency] = useState('actNow');
   const [team, setTeam] = useState('Grounds Crew');
   const [photo, setPhoto] = useState(null);
   const [description, setDescription] = useState('');
@@ -82,7 +83,11 @@ export default function IssuesScreen({ navigate, onDispatch }) {
           onChange={(event) => onChange(event.target.value)}
           className={`field appearance-none pr-10 ${red ? 'text-danger' : ''}`}
         >
-          {options.map((option) => <option value={option} key={option}>{option}</option>)}
+          {options.map((option) => {
+            // options can be plain strings or { value, label }
+            const { value: optionValue, label: optionLabel } = typeof option === 'string' ? { value: option, label: option } : option;
+            return <option value={optionValue} key={optionValue}>{optionLabel}</option>;
+          })}
         </select>
         <ChevronDown aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink" />
       </span>
@@ -112,7 +117,7 @@ export default function IssuesScreen({ navigate, onDispatch }) {
           <p className="status-text mt-2">Current location captured</p>
         </div>
 
-        {dropdown('Urgency', urgency, setUrgency, ['Urgent!', 'Routine'], true)}
+        {dropdown('Urgency', urgency, setUrgency, URGENCY.map(({ id, label }) => ({ value: id, label })), urgency === 'actNow')}
         {dropdown('Team assign', team, setTeam,
           ['Grounds Crew', 'Irrigation Crew', 'Tree Crew', 'Maintenance Crew'])}
 

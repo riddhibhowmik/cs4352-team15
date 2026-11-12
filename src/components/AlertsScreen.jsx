@@ -1,53 +1,94 @@
-import { BellRing } from 'lucide-react';
+import { useState } from 'react';
+import { Bell, CircleAlert, Plus, ChevronRight } from 'lucide-react';
 import ScreenHeader from './ScreenHeader';
+import UrgencyBadge from './UrgencyBadge';
 
-// the card uses data inputted in the issuescreen
-export default function AlertsScreen({ navigate, issue, status }) {
-  const isUrgent = issue?.urgency?.toLowerCase().includes('urgent');
-  const zone = issue?.location?.split(' - ').at(-1) || issue?.location;
+const FILTERS = [
+  { id: 'all',    label: 'All' },
+  { id: 'issue',  label: 'Issues' },
+  { id: 'notice', label: 'Notices' },
+];
+
+const KINDS = {
+  issue:  { label: 'Issue',  icon: CircleAlert },
+  notice: { label: 'Notice', icon: Bell },
+};
+
+// notifications screen — notices and issues with their urgency, newest first
+// the issue sent from the Add Issue form also shows its crew status and a View Issue button
+export default function AlertsScreen({ navigate, notifications, issue, status }) {
+  const [filter, setFilter] = useState('all');
+  const shown = filter === 'all' ? notifications : notifications.filter((item) => item.kind === filter);
+
   const statusLabel = status === 'Dispatched' ? `Dispatched to ${issue?.team}`
     : status === 'In Progress' ? `${issue?.team} is working on it` : `${issue?.team} completed the issue`;
+  const issueScreen = status === 'Resolved' ? 'issueResolved' : status === 'In Progress' ? 'incidentProgress' : 'crewDetail';
 
   return (
     <div className="screen">
       <ScreenHeader onBack={() => navigate('home')} backLabel="Back to Home" />
       <h1 className="page-title">Notifications</h1>
-      {!issue ? (
-        <div className="card space-y-3">
-          <p className="card-title">No issues dispatched yet.</p>
-          <p className="card-text">Create an issue to see its crew assignment and status here.</p>
-          <button onClick={() => navigate('issues')} className="btn-primary">Add Issue</button>
+
+      {/* filter chips */}
+      <div className="flex gap-2 mb-4" role="group" aria-label="Filter notifications">
+        {FILTERS.map(({ id, label }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setFilter(id)}
+            aria-pressed={filter === id}
+            className={`chip ${filter === id ? 'chip-selected' : ''}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* notification list */}
+      {shown.length === 0 ? (
+        <div className="card">
+          <p className="card-title">Nothing here yet</p>
+          <p className="card-text">New {filter === 'issue' ? 'issues' : 'notices'} will show up here.</p>
         </div>
       ) : (
-        <>
-          <div className="card-notice mb-4">
-            <div className="flex gap-2 items-center section-title text-brand">
-              <BellRing className="w-6 h-6 shrink-0" /> New Issue Shared
-            </div>
-            <p className="mt-2 text-[14px]">{statusLabel}</p>
-          </div>
+        <div className="flex flex-col gap-3">
+          {shown.map((item) => {
+            const { label, icon: KindIcon } = KINDS[item.kind];
+            const isLive = item.linkedIssue && issue;
+            return (
+              <article key={item.id} className={`card ${item.urgency === 'actNow' ? 'border-2 border-danger' : ''}`}>
+                <div className="flex justify-between items-center gap-2 mb-3">
+                  <UrgencyBadge level={item.urgency} />
+                  <span className="helper-text font-bold shrink-0">{item.time}</span>
+                </div>
+                <span className="tag mb-1"><KindIcon className="w-3.5 h-3.5" aria-hidden="true" />{label}</span>
+                <h2 className="card-title break-words">{item.title}</h2>
+                <p className="card-text mt-1 whitespace-pre-wrap">{item.text}</p>
+                <p className="helper-text mt-3">From {item.from}</p>
 
-          <article className="card mb-4">
-            <div className="flex justify-between items-center gap-2 mb-4">
-              <span className={isUrgent ? 'badge-urgent' : 'badge-routine'}>● {issue.urgency}</span>
-              <span className="font-bold text-[13px]">{issue.submittedAt}</span>
-            </div>
-            <h2 className="section-title mb-4 break-words">{issue.title}</h2>
-            {issue.photo && <img src={issue.photo} alt="Photo attached to the issue" className="w-full h-[126px] object-cover rounded-xl mb-4" />}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] font-bold">
-              <span>● {zone}</span><span>● {issue.team}</span>
-            </div>
-          </article>
-
-          <div className="mt-4">
-            <button type="button" onClick={() => navigate(status === 'Resolved' ? 'issueResolved' : status === 'In Progress' ? 'incidentProgress' : 'crewDetail')}
-              className="btn-primary">
-              View Issue
-            </button>
-            <p className="helper-text text-center mt-2">Sent to crew dashboard</p>
-          </div>
-        </>
+                {/* the dispatched issue — shows crew status and opens the crew flow */}
+                {isLive && (
+                  <div className="divider mt-3 pt-3">
+                    <p className="status-text mb-2">{statusLabel}</p>
+                    <button type="button" onClick={() => navigate(issueScreen)} className="btn-secondary min-h-[44px] text-[14px]">
+                      View Issue
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </article>
+            );
+          })}
+        </div>
       )}
+
+      {/* add notification — opens the add notification form */}
+      <div className="screen-footer">
+        <button type="button" onClick={() => navigate('addNotification')} className="btn-primary">
+          <Plus className="w-5 h-5" />
+          Add Notification
+        </button>
+      </div>
     </div>
   );
 }
