@@ -5,7 +5,7 @@ import usePlayback from '../hooks/usePlayback';
 // fixed bar heights (in %) so the waveform looks the same every time
 const BARS = Array.from({ length: 36 }, (_, i) => 25 + ((i * 37) % 75));
 
-// demo voice memo player: no real audio, the timer and waveform just simulate playback
+// demo voice memo player — no real audio, the timer and waveform just fake playback
 export default function AudioPlayer({ length }) {
   const { isPlaying, elapsed, progress, toggle } = usePlayback(parseLength(length));
 

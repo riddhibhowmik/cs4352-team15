@@ -3,7 +3,7 @@ import ScreenHeader from './ScreenHeader';
 import Stepper from './Stepper';
 import { itemName, countLabel, inStock } from '../data/inventory';
 
-// one item's storage lots, pick how many to reserve from each (capped at what's in the lot)
+// inventory item screen — pick how many to reserve from each storage lot (capped at what's in it)
 export default function InventoryItemScreen({ navigate, item, picked, onSave }) {
   // local copy of the picks so Back discards changes
   const [draft, setDraft] = useState(() => ({ ...picked }));
@@ -19,6 +19,7 @@ export default function InventoryItemScreen({ navigate, item, picked, onSave }) 
       <p className="page-subtitle mt-0">{available} in stock, {item.inUse} in use</p>
 
       <p className="eyebrow">Inventory details</p>
+      {/* storage lots — each stepper stops at that lot's count */}
       <section className="list-panel pt-1">
         {item.lots.map(({ lot, qty }) => (
           <div key={lot} className="bg-surface mb-1 px-4 py-3">
@@ -32,7 +33,7 @@ export default function InventoryItemScreen({ navigate, item, picked, onSave }) 
               <p className="helper-text mt-1">None left in this lot</p>
             )}
           </div>
-        ))}
+  ))}
       </section>
 
       <div className="screen-footer">

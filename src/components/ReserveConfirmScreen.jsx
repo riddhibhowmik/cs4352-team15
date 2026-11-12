@@ -2,7 +2,7 @@ import ScreenHeader from './ScreenHeader';
 import Stepper from './Stepper';
 
 // review picked items before reserving, quantities can still be adjusted
-// rows: [{ item, lot, max, qty }]
+// Each row is { item, lot, max, qty }
 export default function ReserveConfirmScreen({ navigate, rows, onChangeQty, onReserve }) {
   const total = rows.reduce((sum, row) => sum + row.qty, 0);
 
@@ -33,6 +33,7 @@ export default function ReserveConfirmScreen({ navigate, rows, onChangeQty, onRe
         </>
       )}
 
+      {/* reserve — disabled when nothing is picked */}
       <div className="screen-footer">
         <button type="button" onClick={onReserve} disabled={total === 0} className="btn-primary">
           Reserve Items{total > 0 ? ` (${total})` : ''}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-// simulated playback for demo media: counts up once a second until totalSeconds
+// fake playback for demo media 
 export default function usePlayback(totalSeconds) {
   const [playing, setPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -18,7 +18,7 @@ export default function usePlayback(totalSeconds) {
       setPlaying(false);
       return;
     }
-    if (finished) setElapsed(0); // start over after reaching the end
+    if (finished) setElapsed(0); // Start over after reaching the end
     setPlaying(true);
   };
 

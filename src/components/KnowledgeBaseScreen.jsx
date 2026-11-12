@@ -4,11 +4,11 @@ import ScreenHeader from './ScreenHeader';
 import KnowledgeEntryCard from './KnowledgeEntryCard';
 import { TOPICS } from '../data/knowledgeBase';
 
-// knowledge base home: topics list, or matching entries while searching
+// knowledge base home — topic list, or matching entries while searching
 export default function KnowledgeBaseScreen({ navigate, entries, openTopic, openEntry }) {
   const [query, setQuery] = useState('');
   const search = query.trim().toLowerCase();
-  // search looks at titles and step text
+  // search 
   const matches = search
     ? entries.filter((entry) => [entry.title, ...entry.steps].some((text) => text.toLowerCase().includes(search)))
     : [];
@@ -19,6 +19,7 @@ export default function KnowledgeBaseScreen({ navigate, entries, openTopic, open
       <ScreenHeader onBack={() => navigate('tools')} backLabel="Back to Tools" />
       <h1 className="page-title">Knowledge Base</h1>
 
+      {/* search bar */}
       <label className="relative block mb-4">
         <span className="sr-only">Search the knowledge base</span>
         <input className="search-field" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search guides and steps" />
@@ -50,6 +51,7 @@ export default function KnowledgeBaseScreen({ navigate, entries, openTopic, open
         </section>
       )}
 
+      {/* add entry opens the add entry form */}
       <div className="screen-footer">
         <button type="button" onClick={() => navigate('addEntry')} className="btn-primary">
           <Plus className="w-5 h-5" />

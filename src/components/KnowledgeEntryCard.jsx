@@ -1,6 +1,6 @@
 import { PlayCircle, ListChecks, ChevronRight } from 'lucide-react';
 
-// one knowledge base entry in a list: shows whether it has a video and how many steps
+// knowledge base entru card — shows if it has a video and how many steps
 export default function KnowledgeEntryCard({ entry, topicName, onOpen }) {
   const Icon = entry.video ? PlayCircle : ListChecks;
   const stepsLabel = `${entry.steps.length} step${entry.steps.length === 1 ? '' : 's'}`;

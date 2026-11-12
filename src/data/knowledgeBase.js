@@ -1,5 +1,5 @@
 // knowledge base topics and sample entries (UI demo data)
-// an entry has steps, and optionally a video: { length: '10:40' } (sample) or { src, length } (uploaded)
+// each entry has steps and maybe a video — { length } for samples or { src, length } for uploads
 export const TOPICS = [
   { id: 'planting',  name: 'Planting Guides' },
   { id: 'invasive',  name: 'Dealing with Invasive Plants' },

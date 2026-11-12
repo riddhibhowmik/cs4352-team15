@@ -1,6 +1,6 @@
-// sample equipment in storage (UI demo data)
-// lots: how many are sitting in each storage lot right now (these can be reserved)
-// inUse: how many are already checked out
+// Sample equipment in storage (UI demo data)
+// lots — how many are in each storage lot right now (these can be reserved)
+// inUse — how many are already checked out
 export const INVENTORY = [
   { id: 'truck',     singular: 'Truck',          plural: 'Trucks',          inUse: 1, lots: [{ lot: 'Storage Lot 1', qty: 1 }, { lot: 'Storage Lot 3', qty: 2 }] },
   { id: 'gloves',    singular: 'Pair of Gloves', plural: 'Pairs of Gloves', name: 'Gloves', inUse: 3, lots: [{ lot: 'Storage Lot 3', qty: 8 }] },
@@ -19,7 +19,7 @@ export const INVENTORY = [
 // display name for the list ("Gloves" instead of "Pairs of Gloves")
 export const itemName = (item) => item.name || item.singular;
 
-// "1 Truck" / "3 Trucks"
+
 export const countLabel = (item, count) => `${count} ${count === 1 ? item.singular : item.plural}`;
 
 // total that can still be reserved

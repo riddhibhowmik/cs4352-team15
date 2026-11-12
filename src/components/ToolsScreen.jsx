@@ -1,7 +1,7 @@
 import { Map as MapIcon, Package, BookOpen, ChevronRight } from 'lucide-react';
 import ScreenHeader from './ScreenHeader';
 
-// the three tools from the Figma "Tools" screen, screen is null until that screen is built
+// the three tools from the Figma Tools screen
 const TOOLS = [
   { id: 'map',       label: 'Map',            text: 'Zones, boundaries and site warnings', icon: MapIcon,  screen: 'map' },
   { id: 'inventory', label: 'Inventory',      text: 'Check stock and reserve equipment',   icon: Package,  screen: 'inventory' },

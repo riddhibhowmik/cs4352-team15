@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-// Color and font names point at the CSS variables in src/styles/theme.css,
-// so change a value there and the whole app updates.
+// colors and fonts point at the css variables in src/styles/theme.css
+// so changing a value there updates the whole app
 export default {
   content: [
     "index.html",

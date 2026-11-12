@@ -1,7 +1,7 @@
 import ScreenHeader from './ScreenHeader';
 import VideoPlayer from './VideoPlayer';
 
-// one knowledge base entry: optional video, then the numbered steps
+// Knowledge entry screen —  video, then the numbered steps
 export default function KnowledgeEntryScreen({ navigate, entry, topic }) {
   return (
     <div className="screen">
@@ -18,6 +18,7 @@ export default function KnowledgeEntryScreen({ navigate, entry, topic }) {
         </div>
       )}
 
+      {/* guide steps */}
       <section className="card">
         <h2 className="section-title mb-4">Guide Steps</h2>
         <ol className="space-y-3">

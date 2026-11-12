@@ -3,7 +3,7 @@ import alertsIcon from '../assets/icons/nav-alerts.png';
 import tasksIcon from '../assets/icons/nav-tasks.png';
 import toolsIcon from '../assets/icons/nav-tools.png';
 
-// the four tabs from the Figma menu bar, in Figma order
+// the four tabs from the Figma menu bar, in figma order
 const MENU_TABS = [
   { id: 'home',   label: 'Home',   icon: homeIcon },
   { id: 'alerts', label: 'Alerts', icon: alertsIcon },
@@ -11,7 +11,7 @@ const MENU_TABS = [
   { id: 'tools',  label: 'Tools',  icon: toolsIcon },
 ];
 
-// bottom menu bar, the active tab gets a white pill behind its icon
+// bottom menu bar, the active tab gets a white background behind its icon
 export default function MenuBar({ activeTab, onSelect }) {
   return (
     <nav className="menu-dock" aria-label="Main menu">

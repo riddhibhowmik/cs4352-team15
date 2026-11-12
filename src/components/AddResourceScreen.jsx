@@ -10,7 +10,7 @@ const TYPES = [
 ];
 const MAX_RECORDING = 120; // seconds
 
-// form to add a note or voice memo to a zone (recording is a demo, no microphone is used)
+// add resource form for a zone — note or voice memo (recording is just a demo)
 export default function AddResourceScreen({ navigate, zone, onAdd }) {
   const [type, setType] = useState('note');
   const [title, setTitle] = useState('');
@@ -61,7 +61,7 @@ export default function AddResourceScreen({ navigate, zone, onAdd }) {
           <p className="section-title">{zone.name}</p>
         </div>
 
-        {/* resource type */}
+        {/*Resource type */}
         <div>
           <span className="field-label">Type</span>
           <div className="segmented">

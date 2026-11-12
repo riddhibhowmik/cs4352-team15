@@ -4,16 +4,16 @@ import ScreenHeader from './ScreenHeader';
 import { TOPICS } from '../data/knowledgeBase';
 import { formatSeconds } from '../utils/time';
 
-// form to share a new knowledge base entry: title, topic, optional video and numbered steps
+// add entry form — title, topic, video and numbered steps
 export default function AddEntryScreen({ navigate, returnScreen, defaultTopicId, onAdd }) {
-  const [topicId, setTopicId] = useState(defaultTopicId || TOPICS[0].id);
+  const [topicId,setTopicId] = useState(defaultTopicId || TOPICS[0].id);
   const [title, setTitle] = useState('');
   const [video, setVideo] = useState(null); // { src, name, length }
-  const [steps, setSteps] = useState([{ id: 1, text: '' }]);
+  const [steps,setSteps] = useState([{ id: 1, text: '' }]);
   const [message, setMessage] = useState('');
   const videoInputRef = useRef(null);
 
-  // ----- video (optional) -----
+  // Optional video
   const chooseVideo = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -33,7 +33,7 @@ export default function AddEntryScreen({ navigate, returnScreen, defaultTopicId,
     if (Number.isFinite(seconds)) setVideo((prev) => prev && { ...prev, length: formatSeconds(seconds) });
   };
 
-  // ----- steps -----
+  // steps
   const updateStep = (id, text) => setSteps((prev) => prev.map((step) => (step.id === id ? { ...step, text } : step)));
   const addStep = () => setSteps((prev) => [...prev, { id: Math.max(...prev.map((step) => step.id)) + 1, text: '' }]);
   const removeStep = (id) => setSteps((prev) => prev.filter((step) => step.id !== id));
@@ -76,7 +76,7 @@ export default function AddEntryScreen({ navigate, returnScreen, defaultTopicId,
           </span>
         </label>
 
-        {/* optional video */}
+        {/* optional video*/}
         <div>
           <span className="field-label">Video (optional)</span>
           <input ref={videoInputRef} type="file" accept="video/*" onChange={chooseVideo} className="hidden" aria-label="Choose a video" />
@@ -124,6 +124,7 @@ export default function AddEntryScreen({ navigate, returnScreen, defaultTopicId,
           </button>
         </div>
 
+        {/* publish — shows a message if the title or steps are missing */}
         <div className="screen-footer pt-0">
           {message && <p role="status" className="text-[13px] font-bold text-danger mb-2">{message}</p>}
           <button type="submit" className="btn-primary">

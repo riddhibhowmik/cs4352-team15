@@ -22,6 +22,7 @@ export default function KnowledgeTopicScreen({ navigate, topic, entries, openEnt
         </div>
       )}
 
+      {/* add entry — opens the form with this topic picked */}
       <div className="screen-footer">
         <button type="button" onClick={() => navigate('addEntry')} className="btn-primary">
           <Plus className="w-5 h-5" />

@@ -31,8 +31,8 @@ import { TOPICS, ENTRIES } from './data/knowledgeBase';
 import MenuBar from './components/MenuBar';
 import { findZone } from './data/zones';
 
-// which screens belong to each bottom menu tab (Home, Alerts, Tasks, Tools)
-// 'location' is left out on purpose: its tab depends on where it was opened from
+// screens that belong to each bottom menu tab (Home, Alerts, Tasks, Tools)
+// location is left out on purpose — its tab depends on where it was opened from
 const TAB_SCREENS = {
   home:   ['home'],
   alerts: ['alerts', 'crewDetail', 'incidentProgress', 'issueResolved'],
@@ -44,9 +44,8 @@ const TAB_SCREENS = {
 // screen each tab opens when tapped
 const TAB_START_SCREEN = { home: 'home', alerts: 'alerts', tasks: 'schedule', tools: 'tools' };
 
-// screens whose back button returns to whoever opened them,
-// listed with their own sub-screens (coming back from those keeps the original opener)
-// removes lots with 0 picked and items with nothing picked
+// screens whose back button returns to whoever opened them, plus their sub-screens
+
 const pruneCart = (cart) => Object.fromEntries(
   Object.entries(cart)
     .map(([itemId, picks]) => [itemId, Object.fromEntries(Object.entries(picks).filter(([, qty]) => qty > 0))])
@@ -60,7 +59,7 @@ const REMEMBER_OPENER = {
 };
 
 export default function App() {
-  // simple state to choose which screen to show
+  // state to choose which screen to show
   const [activeScreen, setActiveScreen] = useState('home');
   // tracks which screen opened the blocker, so X / Submit returns there
   const [issueSource, setIssueSource] = useState('home');
@@ -69,14 +68,14 @@ export default function App() {
   const [issueStatus, setIssueStatus] = useState('Dispatched');
   const [startedAt, setStartedAt] = useState(null);
   const [resolvedAt, setResolvedAt] = useState(null);
-  // which screen opened 'location' and 'map', so their back buttons return there
+  // tracks which screen opened location / map, so Back returns there
   const [openedFrom, setOpenedFrom] = useState({ location: 'schedule', map: 'tools' });
-  // zone picked on the Map screen
+  // Zone picked on the Map screen
   const [selectedZoneId, setSelectedZoneId] = useState(null);
   // resources added in the app, by zone id (kept in memory, lost on refresh)
   const [addedResources, setAddedResources] = useState({});
   const baseZone = findZone(selectedZoneId);
-  // newest additions first, then the zone's built-in resources
+  // newest additions, then the zone's built-in resources
   const selectedZone = { ...baseZone, resources: [...(addedResources[baseZone.id] || []), ...baseZone.resources] };
 
   const addResource = (zoneId, resource) => {
@@ -84,14 +83,14 @@ export default function App() {
     setActiveScreen('zoneResources');
   };
 
-  // equipment stock (changes after each reservation) and the items picked so far
+  // qEuipment stok (changes after each reservation) and the items picked so far
   const [inventory, setInventory] = useState(INVENTORY);
-  // cart shape: { itemId: { 'Storage Lot 1': qty, ... } }
+  // cart looks like { itemId: { 'Storage Lot 1': qty } }
   const [cart, setCart] = useState({});
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [reservation, setReservation] = useState(null);
 
-  // screens call this to move around, it remembers who opened 'location' and 'map'
+  // screens call this to switch screens, it also remembers who opened location / map
   const navigate = (screen) => {
     const subScreens = REMEMBER_OPENER[screen];
     if (subScreens && !subScreens.includes(activeScreen)) {
@@ -102,7 +101,7 @@ export default function App() {
     setActiveScreen(screen);
   };
 
-  // ----- knowledge base -----
+  // knowledge base
   const [kbEntries, setKbEntries] = useState(ENTRIES);
   const [selectedTopicId, setSelectedTopicId] = useState(TOPICS[0].id);
   const [selectedEntryId, setSelectedEntryId] = useState(null);
@@ -127,7 +126,7 @@ export default function App() {
     setActiveScreen('knowledgeTopic');
   };
 
-  // ----- inventory -----
+  // inventory
   const openItem = (itemId) => {
     setSelectedItemId(itemId);
     setActiveScreen('inventoryItem');
@@ -143,7 +142,7 @@ export default function App() {
     setCart((prev) => ({ ...prev, [itemId]: { ...prev[itemId], [lot]: qty } }));
   };
 
-  // reserve everything in the cart: lower stock, raise "in use", show the summary
+  // Reserve everything in the cart — lowers stock, raises in use, shows the summary
   const reserveItems = () => {
     const lines = [];
     const nextInventory = inventory.map((item) => {
@@ -181,7 +180,7 @@ export default function App() {
     })));
   const selectedItem = inventory.find((item) => item.id === selectedItemId) || inventory[0];
 
-  // opens the details page for a zone from the Map
+  // open the details page for a zone from the Map
   const openZone = (zoneId) => {
     setSelectedZoneId(zoneId);
     setActiveScreen('zoneDetails');
@@ -195,7 +194,7 @@ export default function App() {
     setActiveScreen('alerts');
   };
 
-  // simulated crew progress, timestamps are from user actions
+  // simulated crew progress, timestamps  from user actions
   const startWork = () => {
     setStartedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     setIssueStatus('In Progress');
@@ -215,7 +214,7 @@ export default function App() {
   };
 
   // derive which bottom menu tab should appear active
-  // the shift-flow location screen stays under Tasks, otherwise it counts as Tools
+  
   const tabScreen = activeScreen === 'location'
     ? (TAB_SCREENS.tasks.includes(openedFrom.location) ? 'schedule' : 'tools')
     : activeScreen;
@@ -254,19 +253,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center p-3">
-
-      {/* screen selector buttons at top of browser for previewing */}
-      <div className="mb-4 bg-slate-800 border border-slate-700 p-2 rounded-xl flex flex-wrap gap-1.5 justify-center max-w-lg text-xs">
-        <button onClick={() => setActiveScreen('home')}      className="px-2.5 py-1 bg-slate-700 text-white rounded">1. Home</button>
-        <button onClick={() => setActiveScreen('schedule')}  className="px-2.5 py-1 bg-slate-700 text-white rounded">2. Schedule</button>
-        <button onClick={() => setActiveScreen('location')}  className="px-2.5 py-1 bg-slate-700 text-white rounded">3. Location</button>
-        <button onClick={() => setActiveScreen('notes')}     className="px-2.5 py-1 bg-emerald-800 text-white rounded">3B. Notes</button>
-        <button onClick={() => setActiveScreen('checklist')} className="px-2.5 py-1 bg-slate-700 text-white rounded">4. Checklist</button>
-        <button onClick={() => setActiveScreen('complete')}  className="px-2.5 py-1 bg-slate-700 text-white rounded">5. Complete</button>
-        <button onClick={() => setActiveScreen('blocker')}   className="px-2.5 py-1 bg-amber-700 text-white rounded">6. Blocker</button>
-        <button onClick={() => setActiveScreen('issues')}    className="px-2.5 py-1 bg-slate-700 text-white rounded">7. Issues</button>
-      </div>
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-3">
 
       {/* make it fit in smartphone screen size with rounded corners */}
       <div className="w-[375px] h-[780px] bg-surface rounded-[40px] border-8 border-black shadow-2xl flex flex-col overflow-hidden relative">

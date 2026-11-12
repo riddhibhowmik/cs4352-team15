@@ -3,7 +3,7 @@ import { ChevronRight, Search, ClipboardCheck } from 'lucide-react';
 import ScreenHeader from './ScreenHeader';
 import { itemName, inStock } from '../data/inventory';
 
-// list of all equipment with stock counts, tap an item to pick quantities
+// List of all equipment with stock counts, tap an item to pick quantities
 export default function InventoryScreen({ navigate, inventory, cart, openItem }) {
   const [query, setQuery] = useState('');
   const visible = inventory.filter((item) => itemName(item).toLowerCase().includes(query.trim().toLowerCase()));
@@ -23,6 +23,7 @@ export default function InventoryScreen({ navigate, inventory, cart, openItem })
         <Search className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted" />
       </label>
 
+      {/* equipment list — tap  to pick quantities */}
       <section className="list-panel pt-1">
         {visible.length === 0 && <p className="body-text px-4 py-4">No equipment matches “{query}”.</p>}
         {visible.map((item) => {
@@ -44,6 +45,7 @@ export default function InventoryScreen({ navigate, inventory, cart, openItem })
         })}
       </section>
 
+      {/* review button  */}
       {totalPicked > 0 && (
         <div className="screen-footer">
           <button type="button" onClick={() => navigate('reserveConfirm')} className="btn-primary">

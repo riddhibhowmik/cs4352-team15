@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react';
 import ScreenHeader from './ScreenHeader';
 
-// confirmation after reserving, summary: { lines: [{ id, label, lots }], reservedBy, date }
+// reserve success screen — { lines, reservedBy, date }
 export default function ReserveSuccessScreen({ navigate, summary }) {
   if (!summary) {
     return (
@@ -20,6 +20,7 @@ export default function ReserveSuccessScreen({ navigate, summary }) {
         <h1 className="page-title mt-6 mb-0">Items Successfully Reserved</h1>
       </div>
 
+      {/* Summary card */}
       <section className="card-notice mt-6">
         <h2 className="section-title text-brand mb-3">Reserved Items</h2>
         <ul className="space-y-2 mb-4">

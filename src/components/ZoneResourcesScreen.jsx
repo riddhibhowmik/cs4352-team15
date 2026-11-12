@@ -10,7 +10,7 @@ const RESOURCE_TYPES = {
   note:    { label: 'Field note',  icon: StickyNote },
 };
 
-// knowledge base resources (videos, voice memos, notes) people added for one zone
+// Knowledge base resources (videos, voice memos, notes) people added for one zone
 export default function ZoneResourcesScreen({ navigate, zone }) {
   return (
     <div className="screen">
@@ -29,7 +29,7 @@ export default function ZoneResourcesScreen({ navigate, zone }) {
             const { label, icon: Icon } = RESOURCE_TYPES[resource.type];
             return (
               <article key={resource.id} className={`card list-row items-start min-h-0 ${resource.isNew ? 'border-brand-mid' : ''}`}>
-                <span className="tool-icon"><Icon className="w-6 h-6" /></span>
+                  <span className="tool-icon"><Icon className="w-6 h-6" /></span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <h2 className="card-title break-words">{resource.title}</h2>
@@ -47,6 +47,7 @@ export default function ZoneResourcesScreen({ navigate, zone }) {
         </div>
       )}
 
+      {/* add resource  opens the add resource form */}
       <div className="screen-footer">
         <button type="button" onClick={() => navigate('addResource')} className="btn-primary">
           <Plus className="w-5 h-5" />

@@ -1,15 +1,6 @@
-/*
-  BioTracker shared styles
-  ------------------------
-  One place for the app's colors, fonts and reusable UI pieces.
-  Colors and fonts come from the Figma "Templates" section.
-
-  How to use:
-  - Prefer these classes (btn-primary, card, field, ...) over one-off Tailwind styling.
-  - Need a color in a plain Tailwind class? Use the token names from
-    tailwind.config.js: bg-brand, text-ink, border-line, text-danger, ...
-  - Never hard-code a hex value in a component. Add a token here instead.
-*/
+/* shared styles for the whole app — colors, fonts and reusable classes (from the figma Templates page)
+   use these classes (btn-primary, card, field...) instead of one-off tailwind styles
+   need a new color? add it here instead of hard-coding a hex value in a component */
 
 :root {
   /* greens */
@@ -50,7 +41,7 @@
 }
 
 @layer components {
-  /* ---------- screen layout ---------- */
+  /* screen layout */
 
   /* root element of every screen */
   .screen {
@@ -84,7 +75,7 @@
     @apply w-10 h-10 shrink-0 rounded-[14px] border border-line bg-surface text-ink flex items-center justify-center;
   }
 
-  /* ---------- text ---------- */
+  /* text */
 
   .page-title {
     @apply font-heading text-[32px] leading-tight text-ink mb-4;
@@ -115,7 +106,7 @@
     @apply text-[12px] font-bold text-brand;
   }
 
-  /* ---------- cards ---------- */
+  /* cards */
 
   .card {
     @apply rounded-[20px] border border-line bg-surface p-4;
@@ -235,7 +226,7 @@
     @apply border-t border-line;
   }
 
-  /* ---------- buttons ---------- */
+  /* buttons */
 
   .btn {
     @apply w-full min-h-[52px] rounded-[14px] px-4 py-3 text-[17px] font-bold flex items-center justify-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed;
@@ -272,7 +263,7 @@
     @apply border-brand bg-brand text-white;
   }
 
-  /* ---------- forms ---------- */
+  /* forms */
 
   .field-label {
     @apply block mb-2 text-[13px] font-bold text-ink;
@@ -286,7 +277,7 @@
     @apply w-full min-h-[68px] rounded-[14px] border border-line bg-surface p-3 text-[14px] text-ink outline-none focus:border-info focus:ring-1 focus:ring-info;
   }
 
-  /* ---------- badges ---------- */
+  /* badges */
 
   .badge {
     @apply inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[12px] font-bold uppercase whitespace-nowrap;
@@ -308,7 +299,7 @@
     @apply badge border-caution text-caution;
   }
 
-  /* ---------- misc ---------- */
+  /* misc */
 
   /* big check circle on success screens */
   .success-icon {
@@ -323,7 +314,7 @@
     @apply h-full bg-brand transition-all duration-300;
   }
 
-  /* ---------- bottom menu (Figma "MenuBar") ---------- */
+  /* bottom menu (Figma "MenuBar") */
 
   /* white strip pinned to the bottom so scrolling content never shows around the menu */
   .menu-dock {

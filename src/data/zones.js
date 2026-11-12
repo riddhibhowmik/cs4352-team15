@@ -1,6 +1,6 @@
 // park zones shown on the Map screen
-// Zone 4 matches the Figma design; zones 5–7 are sample content until real data exists.
-// resource types: 'video', 'audio', 'article', 'note'
+// zone 4 matches the figma design, zones 5-7 are just sample data for now
+// resource types — video, audio, article, note
 export const ZONES = [
   {
     id: 'zone-4',
