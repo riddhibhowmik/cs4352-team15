@@ -1,9 +1,6 @@
+/* shared colors, fonts and UI classes for the whole app */
+@import './styles/theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-body {
-  background-color: "#0f172a";
-  font-family: apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  -webkit-tap-highlight-color: transparent;
-}

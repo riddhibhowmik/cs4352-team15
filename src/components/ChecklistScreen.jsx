@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Check, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { Check, AlertTriangle } from 'lucide-react';
+import ScreenHeader from './ScreenHeader';
 
 const STEPS = [
   { id: 1, label: 'Inspect perimeter & clear debris',  completedAt: '07:45' },
@@ -19,110 +20,72 @@ export default function ChecklistScreen({ navigate, openIssue }) {
   const pct        = Math.round((totalDone / STEPS.length) * 100);
 
   return (
-    <div className="flex-1 px-6 py-2 flex flex-col justify-between overflow-y-auto pb-20">
-      <div>
-        <div className="flex items-center justify-between mb-1">
-          <button
-            onClick={() => navigate('notes')}
-            className="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4 text-slate-800" />
-          </button>
-          <span className="text-[10px] font-bold tracking-widest text-slate-900 uppercase">
-            02 / 02 • CHECKLIST
-          </span>
-        </div>
+    <div className="screen">
+      <ScreenHeader onBack={() => navigate('notes')} backLabel="Back to Site Notes" rightLabel="02 / 02 • Checklist" />
 
-        <h1 className="text-xl font-black text-slate-900 mb-2">Zone 4: Routine Mowing</h1>
+      <h1 className="page-title">Zone 4: Routine Mowing</h1>
 
-        {/* timestamp for when checklist is started */}
-        <div className="flex items-center justify-between text-xs pb-1">
-          <span className="text-emerald-900 font-extrabold text-[11px] bg-emerald-100 px-2 py-0.5 rounded-full">
-            ● IN PROGRESS
-          </span>
-          <span className="text-slate-800 font-bold text-[11px]">Started 07:32</span>
-        </div>
-
-        {/* progress bar */}
-        <div className="flex justify-between text-[11px] font-bold text-slate-900 mb-1 mt-2">
-          <span>Checklist progress</span>
-          <span>{totalDone} / {STEPS.length} complete</span>
-        </div>
-        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden mb-4">
-          <div
-            className="bg-[#193a20] h-full transition-all duration-300"
-            style={{ width: `${pct}%` }}
-          ></div>
-        </div>
-
-        <p className="text-[10px] font-black text-slate-900 tracking-wider mb-2">
-          REQUIRED FIELD STEPS
-        </p>
-
-        {/* task list items — each one toggles on tap */}
-        <div className="space-y-2 mb-4">
-          {STEPS.map((step) => {
-            const done = checked[step.id];
-            return (
-              <button
-                key={step.id}
-                onClick={() => toggle(step.id)}
-                className={`w-full p-3.5 rounded-2xl flex items-center gap-3 text-left transition-colors duration-150 ${
-                  done
-                    ? 'bg-[#cfded0] border border-[#bcd0be]'
-                    : 'bg-white border-2 border-slate-300 shadow-xs'
-                }`}
-              >
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                  done
-                    ? 'bg-[#193a20] text-white'
-                    : 'border-2 border-slate-400'
-                }`}>
-                  {done && <Check className="w-4 h-4 stroke-[3]" />}
-                </div>
-                <div>
-                  <h3 className={`font-bold text-xs text-slate-900 ${done ? 'line-through' : 'font-extrabold'}`}>
-                    {step.label}
-                  </h3>
-                  <p className="text-[10px] font-medium text-slate-600">
-                    {done && step.completedAt
-                      ? `Completed at ${step.completedAt}`
-                      : done
-                      ? 'Completed'
-                      : 'Final mandatory step'}
-                  </p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        <p className="text-[11px] text-slate-700 leading-relaxed mb-3">
-          Check off all items before completing your shift to sync with the supervisor dashboard.
-        </p>
+      {/* timestamp for when checklist is started */}
+      <div className="flex items-center justify-between">
+        <span className="badge-active">● In Progress</span>
+        <span className="font-bold text-[13px]">Started 07:32</span>
       </div>
 
+      {/* progress bar */}
+      <div className="flex justify-between text-[13px] font-bold mb-1 mt-4">
+        <span>Checklist progress</span>
+        <span>{totalDone} / {STEPS.length} complete</span>
+      </div>
+      <div className="progress-track mb-5">
+        <div className="progress-fill" style={{ width: `${pct}%` }}></div>
+      </div>
+
+      <p className="eyebrow">Required field steps</p>
+
+      {/* task list items — each one toggles on tap */}
+      <div className="flex flex-col gap-2 mb-4">
+        {STEPS.map((step) => {
+          const done = checked[step.id];
+          return (
+            <button
+              key={step.id}
+              onClick={() => toggle(step.id)}
+              className={`card-button flex items-center gap-3 ${done ? 'bg-brand-tint border-brand-mid' : 'border-2'}`}
+            >
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                done ? 'bg-brand text-white' : 'border-2 border-ink-muted'
+              }`}>
+                {done && <Check className="w-4 h-4 stroke-[3]" />}
+              </div>
+              <div>
+                <h3 className={`text-[14px] font-bold ${done ? 'line-through' : ''}`}>{step.label}</h3>
+                <p className="helper-text">
+                  {done && step.completedAt
+                    ? `Completed at ${step.completedAt}`
+                    : done
+                    ? 'Completed'
+                    : 'Final mandatory step'}
+                </p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="helper-text leading-relaxed">
+        Check off all items before completing your shift to sync with the supervisor dashboard.
+      </p>
+
       {/* action buttons */}
-      <div className="space-y-2">
-        <button
-          onClick={() => openIssue('checklist')}
-          className="w-full min-h-[48px] py-3 bg-amber-50 border-2 border-amber-600 text-amber-900 font-extrabold text-xs rounded-xl flex items-center justify-center gap-2"
-        >
-          <AlertTriangle className="w-4 h-4 text-amber-700" />
+      <div className="screen-footer space-y-2">
+        <button onClick={() => openIssue('checklist')} className="btn-danger">
+          <AlertTriangle className="w-5 h-5" />
           <span>Report Issue / Blocker</span>
         </button>
 
-        {/* mark complete — only fully active when all steps are checked */}
-        <button
-          onClick={() => allDone && navigate('complete')}
-          disabled={!allDone}
-          className={`w-full min-h-[48px] py-3 font-extrabold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-opacity duration-150 ${
-            allDone
-              ? 'bg-[#193a20] text-white opacity-100'
-              : 'bg-[#193a20] text-white opacity-40 cursor-not-allowed'
-          }`}
-        >
-          <Check className="w-4 h-4 stroke-[3]" />
+        {/* mark complete — only active when all steps are checked */}
+        <button onClick={() => allDone && navigate('complete')} disabled={!allDone} className="btn-primary">
+          <Check className="w-5 h-5 stroke-[3]" />
           <span>Mark Complete</span>
         </button>
       </div>

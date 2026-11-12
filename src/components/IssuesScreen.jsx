@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Camera, ChevronDown, Mic, Plus, Send, Square } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Camera, ChevronDown, Mic, Send, Square } from 'lucide-react';
+import ScreenHeader from './ScreenHeader';
 
 // add Issue page
 export default function IssuesScreen({ navigate, onDispatch }) {
@@ -72,45 +73,33 @@ export default function IssuesScreen({ navigate, onDispatch }) {
     onDispatch({ title: title.trim(), location, urgency, team, photo, description: description.trim(), hasRecording });
   };
 
-  const fieldClass = 'w-full h-[54px] rounded-[14px] border border-[#dce6de] bg-white px-3 text-[14px] font-bold text-[#202a3a] outline-none focus:border-[#577b50] focus:ring-1 focus:ring-[#577b50]';
-
   const dropdown = (label, value, onChange, options, red = false) => (
     <label className="block">
-      <span className="block mb-2 text-[13px] font-extrabold text-[#202a3a]">{label}</span>
+      <span className="field-label">{label}</span>
       <span className="relative block">
         <select
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className={`${fieldClass} appearance-none pr-10 ${red ? 'text-[#c93449]' : ''}`}
+          className={`field appearance-none pr-10 ${red ? 'text-danger' : ''}`}
         >
           {options.map((option) => <option value={option} key={option}>{option}</option>)}
         </select>
-        <ChevronDown aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#202a3a]" />
+        <ChevronDown aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink" />
       </span>
     </label>
   );
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto bg-white px-5 pt-12 pb-20 text-[#202a3a]">
+    <div className="screen">
       <form onSubmit={submitIssue} className="flex flex-col gap-3">
-        <div className="flex items-center justify-between mb-1">
-          <button
-            type="button"
-            onClick={() => navigate('home')}
-            aria-label="Back to Home"
-            className="w-10 h-10 rounded-[14px] border border-[#dce6de] flex items-center justify-center"
-          >
-            <ArrowLeft className="w-6 h-6" strokeWidth={1.6} />
-          </button>
-          <span className="text-[12px] font-extrabold tracking-wide">PARKS CREW</span>
-        </div>
+        <ScreenHeader onBack={() => navigate('schedule')} backLabel="Back to Tasks" />
 
-        <h1 className="text-[34px] leading-tight font-black mt-1 mb-0">Add Issue</h1>
+        <h1 className="page-title mb-0">Add Issue</h1>
 
         <label className="block">
-          <span className="block mb-2 text-[13px] font-extrabold">Title</span>
+          <span className="field-label">Title</span>
           <input
-            className={fieldClass}
+            className="field"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             aria-label="Issue title"
@@ -120,7 +109,7 @@ export default function IssuesScreen({ navigate, onDispatch }) {
         <div>
           {dropdown('GPS location', location, setLocation,
             ['North Park - Quad 4', 'North Park - Zone 2', 'East Trail', 'South Park'])}
-          <p className="text-[12px] font-extrabold text-[#193c27] mt-2">Current location captured</p>
+          <p className="status-text mt-2">Current location captured</p>
         </div>
 
         {dropdown('Urgency', urgency, setUrgency, ['Urgent!', 'Routine'], true)}
@@ -128,8 +117,8 @@ export default function IssuesScreen({ navigate, onDispatch }) {
           ['Grounds Crew', 'Irrigation Crew', 'Tree Crew', 'Maintenance Crew'])}
 
         <div>
-          <span className="block mb-2 text-[13px] font-extrabold">Photo &amp; voice note</span>
-          <div className="flex gap-2 h-[66px]">
+          <span className="field-label">Photo &amp; voice note</span>
+          <div className="flex gap-2">
             <input
               type="file"
               accept="image/*"
@@ -143,7 +132,7 @@ export default function IssuesScreen({ navigate, onDispatch }) {
               type="button"
               aria-label="Add photo"
               onClick={() => photoInputRef.current?.click()}
-              className="min-w-0 flex-1 h-full rounded-xl border border-[#dce6de] flex items-center justify-center gap-2 text-[#193c27] font-extrabold text-[14px]"
+              className="tile-btn"
             >
               <Camera className="w-5 h-5" strokeWidth={2.6} />
               <span>{photo ? 'Photo Added' : 'Add Photo'}</span>
@@ -151,9 +140,9 @@ export default function IssuesScreen({ navigate, onDispatch }) {
             <button
               type="button"
               onClick={toggleRecording}
-              className={`min-w-0 flex-1 h-full rounded-xl border border-[#dce6de] flex items-center justify-center gap-2 font-extrabold text-[14px] ${recording ? 'bg-red-50 text-[#c93449]' : 'text-[#202a3a]'}`}
+              className={`tile-btn ${recording ? 'bg-danger-tint text-danger border-danger' : ''}`}
             >
-              {recording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5 text-[#193c27]" />}
+              {recording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               {recording ? 'Stop' : hasRecording ? 'Recorded' : 'Record'}
             </button>
           </div>
@@ -161,18 +150,15 @@ export default function IssuesScreen({ navigate, onDispatch }) {
         </div>
 
         <label className="block">
-          <span className="block mb-2 text-[13px] font-extrabold">Description (optional)</span>
-          <textarea className="w-full min-h-[68px] rounded-[14px] border border-[#dce6de] bg-white p-3 text-[13px] text-[#202a3a] outline-none focus:border-[#577b50]" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Describe the issue or any safety notes" />
+          <span className="field-label">Description (optional)</span>
+          <textarea className="field-textarea" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Describe the issue or any safety notes" />
         </label>
 
-        <button
-          type="submit"
-          className="h-[53px] rounded-[14px] bg-[#12371d] text-white font-extrabold text-[17px] flex items-center justify-center gap-3 mt-0.5"
-        >
+        <button type="submit" className="btn-primary mt-0.5">
           <Send className="w-5 h-5" />
           Submit &amp; Dispatch
         </button>
-        {message && <p role="status" className="text-[12px] font-semibold text-[#193c27]">{message}</p>}
+        {message && <p role="status" className="status-text">{message}</p>}
       </form>
     </div>
   );

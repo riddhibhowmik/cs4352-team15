@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Trees, Calendar, Trash2, Map, Bell } from 'lucide-react';
+import { useState } from 'react';
 
 // import individual screen components
 import HomeScreen from './components/HomeScreen';
@@ -14,13 +13,51 @@ import AlertsScreen from './components/AlertsScreen';
 import CrewDetailScreen from './components/CrewDetailScreen';
 import IncidentProgressScreen from './components/IncidentProgressScreen';
 import IssueResolvedScreen from './components/IssueResolvedScreen';
+import ToolsScreen from './components/ToolsScreen';
+import MapScreen from './components/MapScreen';
+import ZoneDetailsScreen from './components/ZoneDetailsScreen';
+import ZoneResourcesScreen from './components/ZoneResourcesScreen';
+import AddResourceScreen from './components/AddResourceScreen';
+import InventoryScreen from './components/InventoryScreen';
+import InventoryItemScreen from './components/InventoryItemScreen';
+import ReserveConfirmScreen from './components/ReserveConfirmScreen';
+import ReserveSuccessScreen from './components/ReserveSuccessScreen';
+import { INVENTORY, countLabel } from './data/inventory';
+import KnowledgeBaseScreen from './components/KnowledgeBaseScreen';
+import KnowledgeTopicScreen from './components/KnowledgeTopicScreen';
+import KnowledgeEntryScreen from './components/KnowledgeEntryScreen';
+import AddEntryScreen from './components/AddEntryScreen';
+import { TOPICS, ENTRIES } from './data/knowledgeBase';
+import MenuBar from './components/MenuBar';
+import { findZone } from './data/zones';
 
-// screens that belong to the Shift workflow (Calendar tab active)
-const SHIFT_SCREENS  = ['home', 'schedule', 'notes', 'checklist', 'complete'];
-// screens that belong to Issues (Trash2 tab active)
-const ISSUES_SCREENS = ['blocker', 'issues', 'crewDetail', 'incidentProgress', 'issueResolved'];
-// screens that belong to Map (Map tab active)
-const MAP_SCREENS    = ['location'];
+// which screens belong to each bottom menu tab (Home, Alerts, Tasks, Tools)
+// 'location' is left out on purpose: its tab depends on where it was opened from
+const TAB_SCREENS = {
+  home:   ['home'],
+  alerts: ['alerts', 'crewDetail', 'incidentProgress', 'issueResolved'],
+  tasks:  ['schedule', 'notes', 'checklist', 'complete', 'issues', 'blocker'],
+  tools:  ['tools', 'map', 'zoneDetails', 'zoneResources', 'addResource',
+           'inventory', 'inventoryItem', 'reserveConfirm', 'reserveSuccess',
+           'knowledgeBase', 'knowledgeTopic', 'knowledgeEntry', 'addEntry'],
+};
+// screen each tab opens when tapped
+const TAB_START_SCREEN = { home: 'home', alerts: 'alerts', tasks: 'schedule', tools: 'tools' };
+
+// screens whose back button returns to whoever opened them,
+// listed with their own sub-screens (coming back from those keeps the original opener)
+// removes lots with 0 picked and items with nothing picked
+const pruneCart = (cart) => Object.fromEntries(
+  Object.entries(cart)
+    .map(([itemId, picks]) => [itemId, Object.fromEntries(Object.entries(picks).filter(([, qty]) => qty > 0))])
+    .filter(([, picks]) => Object.keys(picks).length > 0),
+);
+
+const REMEMBER_OPENER = {
+  location: ['notes'],
+  map: ['zoneDetails', 'zoneResources', 'addResource'],
+  addEntry: [],
+};
 
 export default function App() {
   // simple state to choose which screen to show
@@ -32,6 +69,123 @@ export default function App() {
   const [issueStatus, setIssueStatus] = useState('Dispatched');
   const [startedAt, setStartedAt] = useState(null);
   const [resolvedAt, setResolvedAt] = useState(null);
+  // which screen opened 'location' and 'map', so their back buttons return there
+  const [openedFrom, setOpenedFrom] = useState({ location: 'schedule', map: 'tools' });
+  // zone picked on the Map screen
+  const [selectedZoneId, setSelectedZoneId] = useState(null);
+  // resources added in the app, by zone id (kept in memory, lost on refresh)
+  const [addedResources, setAddedResources] = useState({});
+  const baseZone = findZone(selectedZoneId);
+  // newest additions first, then the zone's built-in resources
+  const selectedZone = { ...baseZone, resources: [...(addedResources[baseZone.id] || []), ...baseZone.resources] };
+
+  const addResource = (zoneId, resource) => {
+    setAddedResources((prev) => ({ ...prev, [zoneId]: [resource, ...(prev[zoneId] || [])] }));
+    setActiveScreen('zoneResources');
+  };
+
+  // equipment stock (changes after each reservation) and the items picked so far
+  const [inventory, setInventory] = useState(INVENTORY);
+  // cart shape: { itemId: { 'Storage Lot 1': qty, ... } }
+  const [cart, setCart] = useState({});
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [reservation, setReservation] = useState(null);
+
+  // screens call this to move around, it remembers who opened 'location' and 'map'
+  const navigate = (screen) => {
+    const subScreens = REMEMBER_OPENER[screen];
+    if (subScreens && !subScreens.includes(activeScreen)) {
+      setOpenedFrom((prev) => ({ ...prev, [screen]: activeScreen }));
+    }
+    // drop rows set to 0 so the confirm screen only lists picked items
+    if (screen === 'reserveConfirm') setCart((prev) => pruneCart(prev));
+    setActiveScreen(screen);
+  };
+
+  // ----- knowledge base -----
+  const [kbEntries, setKbEntries] = useState(ENTRIES);
+  const [selectedTopicId, setSelectedTopicId] = useState(TOPICS[0].id);
+  const [selectedEntryId, setSelectedEntryId] = useState(null);
+  const selectedTopic = TOPICS.find((topic) => topic.id === selectedTopicId) || TOPICS[0];
+  const selectedEntry = kbEntries.find((entry) => entry.id === selectedEntryId) || kbEntries[0];
+
+  const openTopic = (topicId) => {
+    setSelectedTopicId(topicId);
+    setActiveScreen('knowledgeTopic');
+  };
+
+  const openEntry = (entry) => {
+    setSelectedTopicId(entry.topicId); // so Back returns to the entry's topic
+    setSelectedEntryId(entry.id);
+    setActiveScreen('knowledgeEntry');
+  };
+
+  // new entries go first, then show the topic they were added to
+  const addKbEntry = (entry) => {
+    setKbEntries((prev) => [entry, ...prev]);
+    setSelectedTopicId(entry.topicId);
+    setActiveScreen('knowledgeTopic');
+  };
+
+  // ----- inventory -----
+  const openItem = (itemId) => {
+    setSelectedItemId(itemId);
+    setActiveScreen('inventoryItem');
+  };
+
+  // save the quantities picked on an item screen and go back to the list
+  const saveItemPicks = (itemId, picks) => {
+    setCart((prev) => pruneCart({ ...prev, [itemId]: picks }));
+    setActiveScreen('inventory');
+  };
+
+  const changeCartQty = (itemId, lot, qty) => {
+    setCart((prev) => ({ ...prev, [itemId]: { ...prev[itemId], [lot]: qty } }));
+  };
+
+  // reserve everything in the cart: lower stock, raise "in use", show the summary
+  const reserveItems = () => {
+    const lines = [];
+    const nextInventory = inventory.map((item) => {
+      const picks = cart[item.id] || {};
+      const total = Object.values(picks).reduce((sum, qty) => sum + qty, 0);
+      if (total === 0) return item;
+      lines.push({
+        id: item.id,
+        label: countLabel(item, total),
+        lots: Object.entries(picks).filter(([, qty]) => qty > 0).map(([lot, qty]) => `${qty} from ${lot}`),
+      });
+      return {
+        ...item,
+        inUse: item.inUse + total,
+        lots: item.lots.map((entry) => ({ ...entry, qty: entry.qty - (picks[entry.lot] || 0) })),
+      };
+    });
+    setInventory(nextInventory);
+    setCart({});
+    setReservation({
+      lines,
+      reservedBy: 'Crew 5',
+      date: new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }),
+    });
+    setActiveScreen('reserveSuccess');
+  };
+
+  // cart flattened into rows for the confirm screen
+  const confirmRows = inventory.flatMap((item) =>
+    Object.entries(cart[item.id] || {}).map(([lot, qty]) => ({
+      item,
+      lot,
+      qty,
+      max: item.lots.find((entry) => entry.lot === lot)?.qty || 0,
+    })));
+  const selectedItem = inventory.find((item) => item.id === selectedItemId) || inventory[0];
+
+  // opens the details page for a zone from the Map
+  const openZone = (zoneId) => {
+    setSelectedZoneId(zoneId);
+    setActiveScreen('zoneDetails');
+  };
 
   const submitDispatch = (issue) => {
     setSubmittedIssue({ ...issue, submittedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
@@ -60,36 +214,47 @@ export default function App() {
     setActiveScreen('blocker');
   };
 
-  // derive which bottom-nav tab should appear active
-  const navTab = SHIFT_SCREENS.includes(activeScreen)
-    ? 'shift'
-    : ISSUES_SCREENS.includes(activeScreen)
-    ? 'issues'
-    : MAP_SCREENS.includes(activeScreen)
-    ? 'map'
-    : 'shift'; // fallback
+  // derive which bottom menu tab should appear active
+  // the shift-flow location screen stays under Tasks, otherwise it counts as Tools
+  const tabScreen = activeScreen === 'location'
+    ? (TAB_SCREENS.tasks.includes(openedFrom.location) ? 'schedule' : 'tools')
+    : activeScreen;
+  const activeTab = Object.keys(TAB_SCREENS).find((tab) => TAB_SCREENS[tab].includes(tabScreen)) || 'home';
 
   // choose which screen component to display, passing navigate so screens can trigger transitions
   const renderCurrentScreen = () => {
     switch (activeScreen) {
-      case 'home':      return <HomeScreen     navigate={setActiveScreen} openIssue={openIssue} />;
-      case 'schedule':  return <ScheduleScreen  navigate={setActiveScreen} />;
-      case 'location':  return <LocationScreen  navigate={setActiveScreen} />;
-      case 'notes':     return <NotesScreen     navigate={setActiveScreen} />;
-      case 'checklist': return <ChecklistScreen navigate={setActiveScreen} openIssue={openIssue} />;
-      case 'complete':  return <CompleteScreen  navigate={setActiveScreen} />;
-      case 'issues':    return <IssuesScreen navigate={setActiveScreen} onDispatch={submitDispatch} />;
-      case 'alerts':    return <AlertsScreen navigate={setActiveScreen} issue={submittedIssue} status={issueStatus} />;
-      case 'crewDetail': return <CrewDetailScreen navigate={setActiveScreen} issue={submittedIssue} onStartWork={startWork} status={issueStatus} />;
-      case 'incidentProgress': return <IncidentProgressScreen navigate={setActiveScreen} issue={submittedIssue} startedAt={startedAt} onResolve={resolveIssue} />;
-      case 'issueResolved': return <IssueResolvedScreen navigate={setActiveScreen} issue={submittedIssue} resolvedAt={resolvedAt} />;
-      case 'blocker':   return <BlockerScreen   navigate={setActiveScreen} returnScreen={issueSource} />;
-      default:          return <HomeScreen      navigate={setActiveScreen} openIssue={openIssue} />;
+      case 'home':      return <HomeScreen     navigate={navigate} openIssue={openIssue} />;
+      case 'schedule':  return <ScheduleScreen  navigate={navigate} />;
+      case 'location':  return <LocationScreen  navigate={navigate} returnScreen={openedFrom.location} />;
+      case 'tools':     return <ToolsScreen     navigate={navigate} />;
+      case 'map':       return <MapScreen       navigate={navigate} openZone={openZone} returnScreen={openedFrom.map} />;
+      case 'zoneDetails':   return <ZoneDetailsScreen   navigate={navigate} zone={selectedZone} />;
+      case 'zoneResources': return <ZoneResourcesScreen navigate={navigate} zone={selectedZone} />;
+      case 'addResource':   return <AddResourceScreen   navigate={navigate} zone={selectedZone} onAdd={addResource} />;
+      case 'inventory':      return <InventoryScreen      navigate={navigate} inventory={inventory} cart={cart} openItem={openItem} />;
+      case 'inventoryItem':  return <InventoryItemScreen  navigate={navigate} item={selectedItem} picked={cart[selectedItem.id] || {}} onSave={saveItemPicks} />;
+      case 'reserveConfirm': return <ReserveConfirmScreen navigate={navigate} rows={confirmRows} onChangeQty={changeCartQty} onReserve={reserveItems} />;
+      case 'reserveSuccess': return <ReserveSuccessScreen navigate={navigate} summary={reservation} />;
+      case 'knowledgeBase':  return <KnowledgeBaseScreen  navigate={navigate} entries={kbEntries} openTopic={openTopic} openEntry={openEntry} />;
+      case 'knowledgeTopic': return <KnowledgeTopicScreen navigate={navigate} topic={selectedTopic} entries={kbEntries.filter((entry) => entry.topicId === selectedTopic.id)} openEntry={openEntry} />;
+      case 'knowledgeEntry': return <KnowledgeEntryScreen navigate={navigate} entry={selectedEntry} topic={selectedTopic} />;
+      case 'addEntry':       return <AddEntryScreen       navigate={navigate} returnScreen={openedFrom.addEntry || 'knowledgeBase'} defaultTopicId={openedFrom.addEntry === 'knowledgeTopic' ? selectedTopic.id : null} onAdd={addKbEntry} />;
+      case 'notes':     return <NotesScreen     navigate={navigate} />;
+      case 'checklist': return <ChecklistScreen navigate={navigate} openIssue={openIssue} />;
+      case 'complete':  return <CompleteScreen  navigate={navigate} />;
+      case 'issues':    return <IssuesScreen navigate={navigate} onDispatch={submitDispatch} />;
+      case 'alerts':    return <AlertsScreen navigate={navigate} issue={submittedIssue} status={issueStatus} />;
+      case 'crewDetail': return <CrewDetailScreen navigate={navigate} issue={submittedIssue} onStartWork={startWork} status={issueStatus} />;
+      case 'incidentProgress': return <IncidentProgressScreen navigate={navigate} issue={submittedIssue} startedAt={startedAt} onResolve={resolveIssue} />;
+      case 'issueResolved': return <IssueResolvedScreen navigate={navigate} issue={submittedIssue} resolvedAt={resolvedAt} />;
+      case 'blocker':   return <BlockerScreen   navigate={navigate} returnScreen={issueSource} />;
+      default:          return <HomeScreen      navigate={navigate} openIssue={openIssue} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center p-3 font-sans text-slate-800">
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center p-3">
 
       {/* screen selector buttons at top of browser for previewing */}
       <div className="mb-4 bg-slate-800 border border-slate-700 p-2 rounded-xl flex flex-wrap gap-1.5 justify-center max-w-lg text-xs">
@@ -104,86 +269,13 @@ export default function App() {
       </div>
 
       {/* make it fit in smartphone screen size with rounded corners */}
-      <div className="w-[375px] h-[780px] bg-white rounded-[40px] border-8 border-black shadow-2xl flex flex-col overflow-hidden relative">
+      <div className="w-[375px] h-[780px] bg-surface rounded-[40px] border-8 border-black shadow-2xl flex flex-col overflow-hidden relative">
 
-        {/* permanent top header with tree icon, except on the Add Issue page */}
-        {!['issues', 'alerts', 'crewDetail', 'incidentProgress', 'issueResolved'].includes(activeScreen) && <div className="px-6 pt-5 pb-2 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 font-bold text-slate-900 text-base">
-            <Trees className="w-5 h-5 text-slate-900" />
-            <span>BioTracker</span>
-          </div>
-          <span className="text-[10px] font-black text-slate-900 tracking-wider">
-            PARKS CREW
-          </span>
-        </div>}
-
-        {/* render active screen component */}
+        {/* render active screen component, each screen draws its own header */}
         {renderCurrentScreen()}
 
-        {/* bottom navigation bar — active tab highlighted with pill, updates with activeScreen */}
-        <nav className="absolute bottom-0 left-0 right-0 border-t border-slate-200 bg-white px-6 py-2 flex justify-between items-center z-10">
-
-          {/* Shift tab — navigates to home (start of shift flow) */}
-          <button
-            onClick={() => setActiveScreen('home')}
-            className={`flex flex-col items-center gap-0.5 ${navTab === 'shift' ? 'text-[#193a20]' : 'text-slate-500'}`}
-          >
-            {navTab === 'shift' ? (
-              <div className="w-12 h-7 rounded-full bg-[#193a20] text-white flex items-center justify-center">
-                <Calendar className="w-4 h-4" />
-              </div>
-            ) : (
-              <Calendar className="w-4 h-4" />
-            )}
-            <span className={`text-[10px] ${navTab === 'shift' ? 'font-extrabold' : 'font-bold'}`}>Shift</span>
-          </button>
-
-          {/* Issues tab — opens the new add issue form, checklist blocker stays separate */}
-          <button
-            onClick={() => setActiveScreen('issues')}
-            className={`flex flex-col items-center gap-0.5 ${navTab === 'issues' ? 'text-[#193a20]' : 'text-slate-500'}`}
-          >
-            {navTab === 'issues' ? (
-              <div className="w-12 h-7 rounded-full bg-[#193a20] text-white flex items-center justify-center">
-                <Trash2 className="w-4 h-4" />
-              </div>
-            ) : (
-              <Trash2 className="w-4 h-4" />
-            )}
-            <span className={`text-[10px] ${navTab === 'issues' ? 'font-extrabold' : 'font-bold'}`}>Issues</span>
-          </button>
-
-          {/* Map tab — navigates to the location / map screen */}
-          <button
-            onClick={() => setActiveScreen('location')}
-            className={`flex flex-col items-center gap-0.5 ${navTab === 'map' ? 'text-[#193a20]' : 'text-slate-500'}`}
-          >
-            {navTab === 'map' ? (
-              <div className="w-12 h-7 rounded-full bg-[#193a20] text-white flex items-center justify-center">
-                <Map className="w-4 h-4" />
-              </div>
-            ) : (
-              <Map className="w-4 h-4" />
-            )}
-            <span className={`text-[10px] ${navTab === 'map' ? 'font-extrabold' : 'font-bold'}`}>Map</span>
-          </button>
-
-          {/* Alerts tab — shows the most recently submitted issue */}
-          <button
-            onClick={() => setActiveScreen('alerts')}
-            className={`flex flex-col items-center gap-0.5 ${['alerts', 'crewDetail', 'incidentProgress', 'issueResolved'].includes(activeScreen) ? 'text-[#193a20]' : 'text-slate-500'}`}
-          >
-            {['alerts', 'crewDetail', 'incidentProgress', 'issueResolved'].includes(activeScreen) ? (
-              <div className="w-12 h-7 rounded-full bg-[#193a20] text-white flex items-center justify-center">
-                <Bell className="w-4 h-4" />
-              </div>
-            ) : (
-              <Bell className="w-4 h-4" />
-            )}
-            <span className="text-[10px] font-bold">Alerts</span>
-          </button>
-
-        </nav>
+        {/* bottom menu bar from Figma: Home, Alerts, Tasks, Tools */}
+        <MenuBar activeTab={activeTab} onSelect={(tab) => setActiveScreen(TAB_START_SCREEN[tab])} />
 
       </div>
     </div>

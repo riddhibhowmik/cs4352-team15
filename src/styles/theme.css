@@ -1,0 +1,352 @@
+/*
+  BioTracker shared styles
+  ------------------------
+  One place for the app's colors, fonts and reusable UI pieces.
+  Colors and fonts come from the Figma "Templates" section.
+
+  How to use:
+  - Prefer these classes (btn-primary, card, field, ...) over one-off Tailwind styling.
+  - Need a color in a plain Tailwind class? Use the token names from
+    tailwind.config.js: bg-brand, text-ink, border-line, text-danger, ...
+  - Never hard-code a hex value in a component. Add a token here instead.
+*/
+
+:root {
+  /* greens */
+  --bt-brand: #1a4709;       /* primary buttons, active states, headings accents */
+  --bt-brand-mid: #4e7934;   /* accent borders, icon buttons */
+  --bt-brand-dark: #476930;  /* secondary green */
+  --bt-brand-soft: #a6bda3;  /* highlighted cards, success circles */
+  --bt-brand-tint: #f3f6f1;  /* light green background behind notices */
+
+  /* text and surfaces */
+  --bt-ink: #202a3a;         /* main text */
+  --bt-ink-muted: #5b6472;   /* secondary text */
+  --bt-line: #dce6de;        /* borders and dividers */
+  --bt-surface: #ffffff;     /* screen and card background */
+  --bt-canvas: #f5f4f2;      /* subtle panels */
+  --bt-nav: #d9ddd6;         /* bottom menu bar */
+
+  /* status */
+  --bt-danger: #b8293d;      /* urgent, errors, recording */
+  --bt-danger-tint: #fbeef0;
+  --bt-caution: #e2690b;     /* site warnings */
+  --bt-info: #7ca1f1;        /* focused inputs */
+
+  /* extra palette colors from Figma */
+  --bt-teal: #89b4ad;
+  --bt-mauve: #b49db0;
+
+  /* fonts (loaded in index.html) */
+  --bt-font-heading: 'Kurale', Georgia, serif;
+  --bt-font-body: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-900 font-body text-ink;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  /* ---------- screen layout ---------- */
+
+  /* root element of every screen */
+  .screen {
+    @apply flex-1 min-h-0 overflow-y-auto bg-surface px-5 pt-8 pb-28 text-ink flex flex-col;
+  }
+
+  /* keep blocks at full height so long screens scroll instead of squishing them */
+  .screen > * {
+    @apply shrink-0;
+  }
+
+  /* pushes the last block (usually the main button) to the bottom */
+  .screen-footer {
+    @apply mt-auto pt-5;
+  }
+
+  /* top row: back button or brand on the left, crew tag on the right */
+  .screen-header {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  .brand-mark {
+    @apply flex items-center gap-2 font-heading text-[18px] text-ink;
+  }
+
+  .crew-tag {
+    @apply text-[12px] font-bold tracking-wide uppercase text-ink;
+  }
+
+  .back-btn {
+    @apply w-10 h-10 shrink-0 rounded-[14px] border border-line bg-surface text-ink flex items-center justify-center;
+  }
+
+  /* ---------- text ---------- */
+
+  .page-title {
+    @apply font-heading text-[32px] leading-tight text-ink mb-4;
+  }
+
+  .page-subtitle {
+    @apply text-[14px] text-ink-muted -mt-3 mb-4;
+  }
+
+  .section-title {
+    @apply font-heading text-[22px] leading-tight text-ink;
+  }
+
+  /* small all-caps label above a group */
+  .eyebrow {
+    @apply text-[12px] font-black tracking-wider uppercase text-ink mb-2;
+  }
+
+  .body-text {
+    @apply text-[14px] leading-relaxed text-ink;
+  }
+
+  .helper-text {
+    @apply text-[12px] text-ink-muted;
+  }
+
+  .status-text {
+    @apply text-[12px] font-bold text-brand;
+  }
+
+  /* ---------- cards ---------- */
+
+  .card {
+    @apply rounded-[20px] border border-line bg-surface p-4;
+  }
+
+  /* card that is a button */
+  .card-button {
+    @apply card w-full text-left transition active:brightness-95;
+  }
+
+  /* green notice card (Figma "Notification") */
+  .card-notice {
+    @apply rounded-[20px] border-2 border-brand-mid bg-brand-tint p-4;
+  }
+
+  /* filled green card for featured items */
+  .card-featured {
+    @apply rounded-[20px] border border-brand-mid bg-brand-soft p-4;
+  }
+
+  .card-title {
+    @apply text-[16px] font-black leading-snug text-ink;
+  }
+
+  .card-text {
+    @apply text-[13px] text-ink-muted mt-1;
+  }
+
+  /* card laid out as icon + text + arrow, e.g. Tools options */
+  .list-row {
+    @apply flex items-center gap-4 min-h-[96px];
+  }
+
+  /* square icon tile at the start of a list row */
+  .tool-icon {
+    @apply w-[50px] h-[50px] shrink-0 rounded-[14px] bg-brand-tint text-brand flex items-center justify-center;
+  }
+
+  /* gray panel holding a stack of tappable rows, e.g. the Zones list */
+  .list-panel {
+    @apply rounded-[20px] bg-canvas pb-2 overflow-hidden;
+  }
+
+  .list-panel-row {
+    @apply w-full min-h-[52px] bg-surface px-4 mb-1 text-left text-[16px] font-bold text-ink flex items-center justify-between gap-3 transition active:brightness-95;
+  }
+
+  /* orange-bordered warning, e.g. "Protected Area" */
+  .callout-caution {
+    @apply rounded-[20px] border-2 border-caution px-4 py-3 text-[15px] font-bold text-ink flex items-center gap-2;
+  }
+
+  /* demo voice memo player (play button + waveform + time) */
+  .audio-player {
+    @apply flex items-center gap-3 rounded-[14px] bg-brand-tint p-3;
+  }
+
+  .audio-play-btn {
+    @apply w-11 h-11 shrink-0 rounded-full bg-brand text-white flex items-center justify-center;
+  }
+
+  .waveform {
+    @apply flex items-center gap-[2px] h-8;
+  }
+
+  .waveform-bar {
+    @apply flex-1 rounded-full transition-colors;
+  }
+
+  /* demo video player box */
+  .video-player {
+    @apply relative w-full aspect-video rounded-[20px] bg-brand text-white flex items-center justify-center overflow-hidden;
+  }
+
+  .video-play-btn {
+    @apply w-16 h-16 rounded-full bg-surface text-brand flex items-center justify-center shadow-lg;
+  }
+
+  /* numbered steps in a guide */
+  .step-item {
+    @apply flex gap-3;
+  }
+
+  .step-number {
+    @apply w-7 h-7 shrink-0 rounded-full bg-brand text-white text-[13px] font-bold flex items-center justify-center;
+  }
+
+  /* two side-by-side choices, e.g. Note / Voice memo */
+  .segmented {
+    @apply grid grid-cols-2 gap-2;
+  }
+
+  /* − 1 + quantity control */
+  .stepper {
+    @apply inline-flex items-center gap-1;
+  }
+
+  .stepper-btn {
+    @apply w-10 h-10 rounded-full border border-line bg-surface text-ink flex items-center justify-center disabled:text-line disabled:cursor-not-allowed;
+  }
+
+  .stepper-value {
+    @apply min-w-[32px] text-center text-[18px] font-bold;
+  }
+
+  /* search input with an icon on the right */
+  .search-field {
+    @apply field pr-11 font-normal bg-canvas;
+  }
+
+  /* label / value row inside a summary card */
+  .meta-row {
+    @apply flex justify-between gap-3 text-[13px];
+  }
+
+  .divider {
+    @apply border-t border-line;
+  }
+
+  /* ---------- buttons ---------- */
+
+  .btn {
+    @apply w-full min-h-[52px] rounded-[14px] px-4 py-3 text-[17px] font-bold flex items-center justify-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand text-white;
+  }
+
+  .btn-secondary {
+    @apply btn border-2 border-brand bg-surface text-brand;
+  }
+
+  .btn-danger {
+    @apply btn border-2 border-danger bg-danger-tint text-danger;
+  }
+
+  /* small round icon button, e.g. a list row arrow */
+  .icon-btn {
+    @apply w-9 h-9 shrink-0 rounded-full bg-brand text-white flex items-center justify-center;
+  }
+
+  /* square tile button, e.g. "Add Photo" / "Record" */
+  .tile-btn {
+    @apply min-w-0 flex-1 h-[66px] rounded-[14px] border border-line bg-surface flex items-center justify-center gap-2 text-[14px] font-bold text-brand;
+  }
+
+  /* selectable option row (radio-style) */
+  .option-btn {
+    @apply w-full min-h-[48px] px-4 rounded-[14px] border border-line bg-surface text-[14px] font-bold text-ink flex items-center justify-between gap-3 transition-colors;
+  }
+
+  .option-btn-selected {
+    @apply border-brand bg-brand text-white;
+  }
+
+  /* ---------- forms ---------- */
+
+  .field-label {
+    @apply block mb-2 text-[13px] font-bold text-ink;
+  }
+
+  .field {
+    @apply w-full h-[54px] rounded-[14px] border border-line bg-surface px-3 text-[14px] font-bold text-ink outline-none focus:border-info focus:ring-1 focus:ring-info;
+  }
+
+  .field-textarea {
+    @apply w-full min-h-[68px] rounded-[14px] border border-line bg-surface p-3 text-[14px] text-ink outline-none focus:border-info focus:ring-1 focus:ring-info;
+  }
+
+  /* ---------- badges ---------- */
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[12px] font-bold uppercase whitespace-nowrap;
+  }
+
+  .badge-urgent {
+    @apply badge border-danger text-danger;
+  }
+
+  .badge-routine {
+    @apply badge border-brand-mid text-brand;
+  }
+
+  .badge-active {
+    @apply badge border-brand-mid bg-brand-tint text-brand;
+  }
+
+  .badge-pending {
+    @apply badge border-caution text-caution;
+  }
+
+  /* ---------- misc ---------- */
+
+  /* big check circle on success screens */
+  .success-icon {
+    @apply w-[112px] h-[112px] rounded-full bg-brand-soft border-2 border-brand text-brand flex items-center justify-center;
+  }
+
+  .progress-track {
+    @apply w-full h-2 rounded-full bg-line overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-brand transition-all duration-300;
+  }
+
+  /* ---------- bottom menu (Figma "MenuBar") ---------- */
+
+  /* white strip pinned to the bottom so scrolling content never shows around the menu */
+  .menu-dock {
+    @apply absolute bottom-0 left-0 right-0 z-10 bg-surface px-4 pt-2 pb-3;
+  }
+
+  .menu-bar {
+    @apply h-[72px] rounded-[30px] bg-nav px-4 flex items-center justify-around;
+  }
+
+  .menu-tab {
+    @apply flex flex-col items-center gap-1 text-[10px] font-light text-ink;
+  }
+
+  .menu-tab-icon {
+    @apply w-12 h-9 rounded-full flex items-center justify-center;
+  }
+
+  .menu-tab-active {
+    @apply font-bold text-brand;
+  }
+
+  .menu-tab-active .menu-tab-icon {
+    @apply bg-surface;
+  }
+}
