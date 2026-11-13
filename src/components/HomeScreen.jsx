@@ -19,7 +19,7 @@ export default function HomeScreen({ navigate }) {
 
       <div className="flex flex-col gap-3">
         {/* Quick status signoff */}
-        <button onClick={() => navigate('schedule')} className="card-button border-2 border-brand-mid bg-brand-tint">
+        <button onClick={() => navigate('schedule')} className="card-button">
           <h3 className="card-title">Quick Status Signoff and Zone Check</h3>
           <p className="card-text">Confirm location, execute checklist, and sign off shift status</p>
         </button>
@@ -37,7 +37,7 @@ export default function HomeScreen({ navigate }) {
         </button>
 
         {/* Shared Crew Board button */}
-        <button onClick={() => navigate('crewBoard')} className="card-button border border-brand-mid bg-brand-tint">
+        <button onClick={() => navigate('crewBoard')} className="card-button">
           <h3 className="card-title text-brand">Shared Crew Board</h3>
           <p className="card-text">View active team tasks, in progress items, and completed work</p>
         </button>
