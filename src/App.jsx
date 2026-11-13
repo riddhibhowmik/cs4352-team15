@@ -29,6 +29,16 @@ import KnowledgeBaseScreen from './components/KnowledgeBaseScreen';
 import KnowledgeTopicScreen from './components/KnowledgeTopicScreen';
 import KnowledgeEntryScreen from './components/KnowledgeEntryScreen';
 import AddEntryScreen from './components/AddEntryScreen';
+import ZoneRecordsScreen from './components/ZoneRecordsScreen';
+import VeteranKnowledgeScreen from './components/VeteranKnowledgeScreen';
+import VideoGuideScreen from './components/VideoGuideScreen';
+import AudioNoteScreen from './components/AudioNoteScreen';
+import TruckInventoryScreen from './components/TruckInventoryScreen';
+import ReserveEquipmentScreen from './components/ReserveEquipmentScreen';
+import WorkPlanScreen from './components/WorkPlanScreen';
+import AssignCrewScreen from './components/AssignCrewScreen';
+import PlanPublishedScreen from './components/PlanPublishedScreen';
+import CrewBoardScreen from './components/CrewBoardScreen';
 import { TOPICS, ENTRIES } from './data/knowledgeBase';
 import MenuBar from './components/MenuBar';
 import { findZone } from './data/zones';
@@ -41,7 +51,10 @@ const TAB_SCREENS = {
   tasks:  ['schedule', 'notes', 'checklist', 'complete', 'issues', 'blocker'],
   tools:  ['tools', 'map', 'zoneDetails', 'zoneResources', 'addResource',
            'inventory', 'inventoryItem', 'reserveConfirm', 'reserveSuccess',
-           'knowledgeBase', 'knowledgeTopic', 'knowledgeEntry', 'addEntry'],
+           'knowledgeBase', 'knowledgeTopic', 'knowledgeEntry', 'addEntry',
+           'zoneRecords', 'veteranKnowledge', 'videoGuide', 'audioNote',
+           'truckInventory', 'reserveEquipment', 'workPlan', 'assignCrew',
+           'planPublished', 'crewBoard'],
 };
 // screen each tab opens when tapped
 const TAB_START_SCREEN = { home: 'home', alerts: 'alerts', tasks: 'schedule', tools: 'tools' };
@@ -77,6 +90,8 @@ export default function App() {
   // Zone picked on the Map screen
   const [selectedZoneId, setSelectedZoneId] = useState(null);
   // resources added in the app, by zone id (kept in memory, lost on refresh)
+  const [hasReservedCones, setHasReservedCones] = useState(false);
+  const [isReadyToPublish, setIsReadyToPublish] = useState(false);
   const [addedResources, setAddedResources] = useState({});
   const baseZone = findZone(selectedZoneId);
   // newest additions, then the zone's built-in resources
@@ -245,7 +260,7 @@ export default function App() {
   // choose which screen component to display, passing navigate so screens can trigger transitions
   const renderCurrentScreen = () => {
     switch (activeScreen) {
-      case 'home':      return <HomeScreen     navigate={navigate} openIssue={openIssue} />;
+      case 'home':      return <HomeScreen     navigate={navigate} />;
       case 'schedule':  return <ScheduleScreen  navigate={navigate} />;
       case 'location':  return <LocationScreen  navigate={navigate} returnScreen={openedFrom.location} />;
       case 'tools':     return <ToolsScreen     navigate={navigate} />;
@@ -270,6 +285,16 @@ export default function App() {
       case 'crewDetail': return <CrewDetailScreen navigate={navigate} issue={submittedIssue} onStartWork={startWork} status={issueStatus} />;
       case 'incidentProgress': return <IncidentProgressScreen navigate={navigate} issue={submittedIssue} startedAt={startedAt} onResolve={resolveIssue} />;
       case 'issueResolved': return <IssueResolvedScreen navigate={navigate} issue={submittedIssue} resolvedAt={resolvedAt} />;
+      case 'zoneRecords':    return <ZoneRecordsScreen    navigate={navigate} zone={selectedZone} />;
+      case 'veteranKnowledge': return <VeteranKnowledgeScreen navigate={navigate} zone={selectedZone} />;
+      case 'videoGuide':     return <VideoGuideScreen     navigate={navigate} />;
+      case 'audioNote':      return <AudioNoteScreen      navigate={navigate} />;
+      case 'truckInventory': return <TruckInventoryScreen navigate={navigate} hasReservedCones={hasReservedCones} />;
+      case 'reserveEquipment': return <ReserveEquipmentScreen navigate={navigate} onReserveConfirmed={() => setHasReservedCones(true)} />;
+      case 'workPlan':       return <WorkPlanScreen       navigate={navigate} isReadyToPublish={isReadyToPublish} />;
+      case 'assignCrew':     return <AssignCrewScreen     navigate={navigate} onSaveAssignments={() => setIsReadyToPublish(true)} />;
+      case 'planPublished':  return <PlanPublishedScreen  navigate={navigate} />;
+      case 'crewBoard':      return <CrewBoardScreen      navigate={navigate} />;
       case 'blocker':   return <BlockerScreen   navigate={navigate} returnScreen={issueSource} />;
       default:          return <HomeScreen      navigate={navigate} openIssue={openIssue} />;
     }

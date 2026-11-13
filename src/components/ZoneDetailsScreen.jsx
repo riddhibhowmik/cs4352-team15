@@ -1,4 +1,4 @@
-import { ChevronRight, AlertTriangle } from 'lucide-react';
+import { ChevronRight, AlertTriangle, BookOpen, FileText, Package, Users } from 'lucide-react';
 import ScreenHeader from './ScreenHeader';
 
 // zone details screen 
@@ -25,17 +25,41 @@ export default function ZoneDetailsScreen({ navigate, zone }) {
           </ul>
         </div>
       </section>
-      
 
-      {/* zone resources, opens notes, memos and guides for this zone */}
-      <p className="eyebrow">Access zone resources</p>
-      <button type="button" onClick={() => navigate('zoneResources')} className="card-button list-row min-h-[80px]">
-        <span className="flex-1 body-text font-bold">
-          View Knowledge Base resources specific to {zone.name.split(':')[0]}
-        </span>
-        <span className="badge-routine">{zone.resources.length}</span>
-        <ChevronRight className="w-5 h-5 text-ink-muted shrink-0" />
-      </button>
+      {/* zone records & complex workflow links available for all zones */}
+      <div className="space-y-3 mb-5">
+        <button type="button" onClick={() => navigate('zoneRecords')} className="card-button list-row min-h-[72px]">
+          <FileText className="w-6 h-6 text-brand" />
+          <span className="flex-1 body-text font-bold">View zone records &amp; boundaries</span>
+          <ChevronRight className="w-5 h-5 text-ink-muted shrink-0" />
+        </button>
+
+        <button type="button" onClick={() => navigate('veteranKnowledge')} className="card-button list-row min-h-[72px]">
+          <BookOpen className="w-6 h-6 text-brand" />
+          <span className="flex-1 body-text font-bold">Knowledge Library &amp; Veteran Guidance</span>
+          <span className="badge-routine">{zone.resources.length}</span>
+          <ChevronRight className="w-5 h-5 text-ink-muted shrink-0" />
+        </button>
+
+        <button type="button" onClick={() => navigate('truckInventory')} className="card-button list-row min-h-[72px]">
+          <Package className="w-6 h-6 text-brand" />
+          <span className="flex-1 body-text font-bold">Check Truck Inventory &amp; Reserve Tools</span>
+          <ChevronRight className="w-5 h-5 text-ink-muted shrink-0" />
+        </button>
+
+        <button type="button" onClick={() => navigate('crewBoard')} className="card-button list-row min-h-[72px]">
+          <Users className="w-6 h-6 text-brand" />
+          <span className="flex-1 body-text font-bold">Open Shared Crew Board</span>
+          <ChevronRight className="w-5 h-5 text-ink-muted shrink-0" />
+        </button>
+      </div>
+
+      <div className="screen-footer">
+        <button type="button" onClick={() => navigate('map')} className="btn-secondary">
+          Back to Zone Selection
+        </button>
+      </div>
     </div>
   );
 }
+
